@@ -6,20 +6,42 @@
     <title><%= title %></title>
   </head>
   <body>
+    <%- include('../partials/header') %>
+
     <div class="container">
-      <h1>User Dashboard</h1>
-      <% if (isAuthenticated) { %>
-      <p>Welcome, <%= user.username %></p>
-      <div class="dashboard-actions">
-        <a href="/quiz/browse" class="btn">Browse Quizzes</a>
-        <a href="/quiz/create" class="btn">Create a Quiz</a>
-        <a href="/user/profile" class="btn">My Profile</a>
-        <a href="/auth/logout" class="btn">Logout</a>
+      <div class="card">
+        <h1>User Dashboard</h1>
+        <% if (isAuthenticated) { %>
+        <p>Welcome, <%= user.username %></p>
+
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div>Quizzes Taken</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div>Quizzes Created</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">0%</div>
+            <div>Average Score</div>
+          </div>
+        </div>
+
+        <div class="dashboard-actions">
+          <a href="/quiz/browse" class="btn">Browse Quizzes</a>
+          <a href="/quiz/create" class="btn">Create a Quiz</a>
+          <a href="/user/profile" class="btn">My Profile</a>
+          <a href="/auth/logout" class="btn">Logout</a>
+        </div>
+        <% } else { %>
+        <p>You need to be logged in to view this page.</p>
+        <a href="/auth/login" class="btn">Login</a>
+        <% } %>
       </div>
-      <% } else { %>
-      <p>You need to be logged in to view this page.</p>
-      <a href="/auth/login" class="btn">Login</a>
-      <% } %>
     </div>
+
+    <%- include('../partials/footer') %>
   </body>
 </html>

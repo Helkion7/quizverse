@@ -6,12 +6,57 @@
     <title><%= title %></title>
   </head>
   <body>
-    <div class="container">
+    <%- include('partials/header') %>
+
+    <div class="card">
       <h1>Frequently Asked Questions</h1>
-      <p>Coming soon...</p>
-      <div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How do I create a quiz?</span>
+          <span class="toggle-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>
+            To create a quiz, you need to be registered and logged in. Once
+            logged in, go to your dashboard and click on the "Create a Quiz"
+            button. Follow the instructions to add questions and answers.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Can I edit a quiz after publishing it?</span>
+          <span class="toggle-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>
+            Yes, you can edit your quizzes at any time. Go to your dashboard,
+            find the quiz you want to edit, and click on the "Edit" button.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How are quiz scores calculated?</span>
+          <span class="toggle-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>
+            Quiz scores are calculated based on the number of correct answers.
+            Each question can have different point values assigned by the quiz
+            creator.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-4">
         <a href="/" class="btn">Back to Home</a>
       </div>
     </div>
+
+    <%- include('partials/footer') %>
   </body>
 </html>

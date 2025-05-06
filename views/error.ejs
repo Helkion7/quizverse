@@ -4,15 +4,46 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Error - QuizVerse</title>
-    <style></style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+      .error-container {
+        text-align: center;
+        padding: 50px 20px;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+      .error-code {
+        font-size: 6rem;
+        font-weight: bold;
+        color: var(--color-secondary);
+        margin-bottom: 20px;
+      }
+
+      .error-message {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+      }
+
+      .back-home {
+        display: inline-block;
+        margin-top: 20px;
+      }
+    </style>
   </head>
   <body>
-    <div>
-      <h1>Oops! Something went wrong</h1>
-      <div>
+    <div class="error-container">
+      <div class="error-code">Oops!</div>
+      <h1>Something went wrong</h1>
+      <div class="error-message">
         <p><%= message %></p>
       </div>
-      <a href="/">Back to Home</a>
+      <a href="/" class="btn back-home">Back to Home</a>
     </div>
   </body>
 </html>

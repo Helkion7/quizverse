@@ -6,25 +6,49 @@
     <title><%= title %></title>
   </head>
   <body>
+    <%- include('../partials/header') %>
+
     <div class="container">
-      <h1>My Profile</h1>
-      <% if (user) { %>
-      <div class="profile-info">
-        <p><strong>Username:</strong> <%= user.username %></p>
-        <p><strong>Email:</strong> <%= user.email %></p>
-        <p><strong>Role:</strong> <%= user.role %></p>
-      </div>
-      <div>
-        <% if (isAuthenticated) { %>
-        <a href="/user/dashboard">Back to Dashboard</a>
+      <div class="card">
+        <h1>My Profile</h1>
+        <% if (user) { %>
+        <div class="profile-info">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <!-- Placeholder for user avatar -->
+            </div>
+            <div class="profile-details">
+              <h2><%= user.username %></h2>
+              <p><%= user.email %></p>
+              <p class="badge"><%= user.role %></p>
+            </div>
+          </div>
+
+          <div class="profile-stats">
+            <div class="profile-stat">
+              <div class="profile-stat-value">0</div>
+              <div class="profile-stat-label">Quizzes Taken</div>
+            </div>
+            <div class="profile-stat">
+              <div class="profile-stat-value">0</div>
+              <div class="profile-stat-label">Quizzes Created</div>
+            </div>
+            <div class="profile-stat">
+              <div class="profile-stat-value">0</div>
+              <div class="profile-stat-label">Average Score</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <a href="/user/dashboard" class="btn">Back to Dashboard</a>
+        </div>
         <% } else { %>
-        <a href="/auth/login">Login</a>
+        <p>You need to be logged in to view this page.</p>
+        <a href="/auth/login" class="btn">Login</a>
         <% } %>
       </div>
-      <% } else { %>
-      <p>You need to be logged in to view this page.</p>
-      <a href="/auth/login" class="btn">Login</a>
-      <% } %>
     </div>
+
+    <%- include('../partials/footer') %>
   </body>
 </html>

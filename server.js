@@ -63,13 +63,19 @@ app.use("/quiz", quizRoutes);
 app.use("/", staticRoutes);
 
 // Error handling middleware
-app.use((req, res) => {
-  res.status(404).render("error", { error: "Page not found" });
+app.use((req, res, next) => {
+  res.status(404).render("error", {
+    error: "Page not found",
+    message: "Page not found",
+  });
 });
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).render("error", { error: "Something went wrong!" });
+  res.status(500).render("error", {
+    error: "Something went wrong!",
+    message: "Something went wrong!",
+  });
 });
 
 // Start the server

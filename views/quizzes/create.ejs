@@ -6,12 +6,67 @@
     <title><%= title %></title>
   </head>
   <body>
+    <%- include('../partials/header') %>
+
     <div class="container">
-      <h1>Create a Quiz</h1>
-      <p>Quiz creation form coming soon...</p>
-      <div>
-        <a href="/user/dashboard">Back to Dashboard</a>
+      <div class="card">
+        <h1>Create a Quiz</h1>
+
+        <form action="/quiz/create" method="POST">
+          <div class="form-group">
+            <label for="title" class="form-label">Quiz Title</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="description" class="form-label">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              class="form-control"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="category" class="form-label">Category</label>
+            <select id="category" name="category" class="form-control">
+              <option value="programming">Programming</option>
+              <option value="networking">Networking</option>
+              <option value="databases">Databases</option>
+              <option value="cybersecurity">Cybersecurity</option>
+              <option value="web-development">Web Development</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Visibility</label>
+            <div>
+              <label>
+                <input type="radio" name="isPublic" value="true" checked />
+                Public
+              </label>
+              <label>
+                <input type="radio" name="isPublic" value="false" /> Private
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">Create Quiz</button>
+            <a href="/user/dashboard" class="btn">Back to Dashboard</a>
+          </div>
+        </form>
       </div>
     </div>
+
+    <%- include('../partials/footer') %>
   </body>
 </html>

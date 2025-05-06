@@ -7,11 +7,55 @@
   </head>
   <body>
     <div class="container">
+      <%- include('../partials/header') %>
+
       <h1>Browse Quizzes</h1>
-      <p>No quizzes available yet.</p>
-      <div>
+
+      <div class="filters mb-4">
+        <input
+          type="text"
+          placeholder="Search quizzes..."
+          class="form-control"
+        />
+        <select class="form-control">
+          <option value="">All Categories</option>
+          <option value="programming">Programming</option>
+          <option value="networking">Networking</option>
+          <option value="databases">Databases</option>
+          <option value="cybersecurity">Cybersecurity</option>
+          <option value="web-development">Web Development</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="quiz-list">
+        <div class="card quiz-list-item animate-fade-in">
+          <div class="card-body">
+            <h3>Sample Quiz 1</h3>
+            <p>This is a placeholder for quiz description.</p>
+            <div class="quiz-meta">
+              <span>15 questions</span>
+              <span>10 min</span>
+            </div>
+          </div>
+        </div>
+        <div class="card quiz-list-item animate-fade-in">
+          <div class="card-body">
+            <h3>Sample Quiz 2</h3>
+            <p>This is a placeholder for quiz description.</p>
+            <div class="quiz-meta">
+              <span>10 questions</span>
+              <span>8 min</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4">
         <a href="/" class="btn">Back to Home</a>
       </div>
+
+      <%- include('../partials/footer') %>
     </div>
   </body>
 </html>

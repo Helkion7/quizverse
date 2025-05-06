@@ -6,9 +6,11 @@
     <title><%= title %></title>
   </head>
   <body>
-    <div class="container">
+    <%- include('partials/header') %>
+
+    <div class="hero">
       <h1>Welcome to QuizVerse</h1>
-      <p>Your interactive quiz platform</p>
+      <p>Your interactive quiz platform for learning and fun</p>
 
       <div class="actions">
         <% if (user) { %>
@@ -23,16 +25,29 @@
         <% } %>
       </div>
 
-      <div>
-        <div>
-          <% if (isAuthenticated) { %>
-          <a href="/user/dashboard">Dashboard</a>
-          <% } else { %>
-          <a href="/auth/login">Login</a>
-          <a href="/auth/register">Register</a>
-          <% } %>
+      <div class="featured-quizzes">
+        <h2>Popular Quizzes</h2>
+        <div class="quiz-list">
+          <div class="card animate-fade-in">
+            <h3>Programming Basics</h3>
+            <p>Test your knowledge of programming fundamentals</p>
+            <div class="quiz-meta">
+              <span>15 questions</span>
+              <span>500+ attempts</span>
+            </div>
+          </div>
+          <div class="card animate-fade-in">
+            <h3>Web Development</h3>
+            <p>Challenge yourself with HTML, CSS and JavaScript questions</p>
+            <div class="quiz-meta">
+              <span>20 questions</span>
+              <span>300+ attempts</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <%- include('partials/footer') %>
   </body>
 </html>

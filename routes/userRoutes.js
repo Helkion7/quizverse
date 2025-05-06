@@ -5,10 +5,18 @@ const { isAuthenticated } = require("../middleware/authMiddleware");
 // Placeholder for user controller (will implement later)
 const userController = {
   getDashboard: (req, res) => {
-    res.render("users/dashboard", { title: "Dashboard" });
+    res.render("users/dashboard", {
+      title: "Dashboard",
+      isAuthenticated: !!req.user,
+      user: req.user,
+    });
   },
   getProfile: (req, res) => {
-    res.render("users/profile", { title: "My Profile" });
+    res.render("users/profile", {
+      title: "User Profile",
+      isAuthenticated: !!req.user,
+      user: req.user,
+    });
   },
 };
 
