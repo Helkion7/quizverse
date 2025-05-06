@@ -60,7 +60,11 @@ exports.postLogin = async (req, res) => {
     });
 
     // Redirect based on role
-    res.redirect("/user/dashboard");
+    if (user.role === "admin") {
+      res.redirect("/admin/dashboard");
+    } else {
+      res.redirect("/user/dashboard");
+    }
   } catch (error) {
     console.error("Login error:", error);
     res.render("auth/login", {

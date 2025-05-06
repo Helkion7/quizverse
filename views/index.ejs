@@ -13,7 +13,11 @@
 
       <div class="actions">
         <% if (user) { %>
-        <a href="/user/dashboard" class="btn btn-primary">Go to Dashboard</a>
+        <a
+          href="<%= user && user.role === 'admin' ? '/admin/dashboard' : '/user/dashboard' %>"
+          class="btn btn-primary"
+          >Go to Dashboard</a
+        >
         <% } else { %>
         <a href="/auth/login" class="btn btn-primary">Login</a>
         <a href="/auth/register" class="btn">Register</a>

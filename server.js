@@ -8,6 +8,7 @@ const dotenv = require("dotenv");
 // Import routes
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const staticRoutes = require("./routes/staticRoutes");
 
@@ -57,6 +58,7 @@ app.use((req, res, next) => {
 // Routes
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
+app.use("/admin", adminRoutes);
 app.use("/quiz", quizRoutes);
 app.use("/", staticRoutes);
 
