@@ -8,32 +8,67 @@
   <body>
     <%- include('../partials/header') %>
 
-    <div class="container">
-      <div class="card">
-        <h1>Quiz Details</h1>
+    <div class="container mt-4">
+      <% if (quiz) { %>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1><%= quiz.title %></h1>
+        <% if (isCreator) { %>
+        <a href="/quiz/<%= quiz._id %>/edit" class="btn btn-secondary"
+          >Edit Quiz</a
+        >
+        <% } %>
+      </div>
 
-        <div class="quiz-header">
-          <h2>Sample Quiz Title</h2>
-          <p>Created by: Username</p>
-          <div class="quiz-meta">
-            <span>15 questions</span>
-            <span>10 min</span>
-            <span>500+ attempts</span>
-          </div>
-        </div>
-
-        <div class="quiz-description">
-          <h3>Description</h3>
-          <p>
-            A detailed description of what this quiz covers would appear here.
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Quiz Details</h5>
+          <p class="card-text">
+            <%= quiz.description || 'No description provided' %>
+          </p>
+          <p class="card-text">
+            <small class="text-muted">
+              Created by <%= quiz.creator ? quiz.creator.username : 'Unknown' %>
+              • <%= quiz.questions.length %> questions • Created on <%= new
+              Date(quiz.createdAt).toLocaleDateString() %>
+            </small>
           </p>
         </div>
+      </div>
 
-        <div class="quiz-actions mt-4">
-          <a href="/quiz/1/attempt" class="btn btn-primary">Start Quiz</a>
-          <a href="/quiz/browse" class="btn">Back to Quizzes</a>
+      <div class="text-center mb-4">
+        <a href="/quiz/<%= quiz._id %>/take" class="btn btn-primary btn-lg"
+          >Take Quiz</a
+        >
+      </div>
+
+      <% if (quiz.questions && quiz.questions.length > 0) { %>
+      <h3>Preview</h3>
+      <p class="text-muted">Here's a preview of what to expect:</p>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Sample Question</h5>
+          <p class="card-text"><%= quiz.questions[0].questionText %></p>
+          <% if (quiz.questions[0].options && quiz.questions[0].options.length >
+          0) { %>
+          <ul class="list-group list-group-flush">
+            <% quiz.questions[0].options.forEach(option => { %>
+            <li class="list-group-item">
+              (Option preview) <%= option.optionText %>
+            </li>
+            <% }); %>
+          </ul>
+          <% } %>
+          <p class="text-muted mt-3">
+            ... and <%= quiz.questions.length - 1 %> more questions
+          </p>
         </div>
       </div>
+      <% } %> <% } else { %>
+      <div class="alert alert-warning">
+        Quiz not found. <a href="/quiz/browse">Browse available quizzes</a>
+      </div>
+      <% } %>
     </div>
 
     <%- include('../partials/footer') %>

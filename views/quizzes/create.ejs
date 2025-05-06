@@ -4,6 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
+    <style>
+      .question-container {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+      }
+      .options-container {
+        margin-left: 20px;
+      }
+      .option-row {
+        margin-bottom: 10px;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <%- include('../partials/header') %>
@@ -12,7 +29,7 @@
       <div class="card">
         <h1>Create a Quiz</h1>
 
-        <form action="/quiz/create" method="POST">
+        <form action="/quiz/create" method="POST" id="quizForm">
           <div class="form-group">
             <label for="title" class="form-label">Quiz Title</label>
             <input
@@ -59,6 +76,17 @@
             </div>
           </div>
 
+          <!-- Questions Section -->
+          <div class="form-group">
+            <h2>Questions</h2>
+            <div id="questions-container"></div>
+            <button type="button" id="add-question" class="btn">
+              Add Question
+            </button>
+          </div>
+
+          <input type="hidden" name="questions" id="questions-data" />
+
           <div class="form-group">
             <button type="submit" class="btn btn-primary">Create Quiz</button>
             <a href="/user/dashboard" class="btn">Back to Dashboard</a>
@@ -66,6 +94,278 @@
         </form>
       </div>
     </div>
+
+    <!-- Question Template -->
+    <template id="question-template">
+      <div class="question-container">
+        <div class="form-group">
+          <label class="form-label">Question Text</label>
+          <input type="text" class="form-control question-text" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Question Type</label>
+          <select class="form-control question-type">
+            <option value="multiple-choice">Multiple Choice</option>
+            <option value="true-false">True/False</option>
+            <option value="short-answer">Short Answer</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Points</label>
+          <input
+            type="number"
+            class="form-control question-points"
+            value="10"
+            min="1"
+            max="100"
+          />
+        </div>
+
+        <div class="form-group multiple-choice-options">
+          <label class="form-label">Options</label>
+          <div class="options-container"></div>
+          <button type="button" class="btn add-option">Add Option</button>
+        </div>
+
+        <div class="form-group true-false-options hidden">
+          <label>
+            <input type="radio" name="true-false-QUESTIONID" value="true" />
+            True
+          </label>
+          <label>
+            <input type="radio" name="true-false-QUESTIONID" value="false" />
+            False
+          </label>
+        </div>
+
+        <div class="form-group short-answer-option hidden">
+          <label class="form-label">Correct Answer</label>
+          <input type="text" class="form-control correct-answer" />
+        </div>
+
+        <button type="button" class="btn remove-question">
+          Remove Question
+        </button>
+      </div>
+    </template>
+
+    <!-- Option Template -->
+    <template id="option-template">
+      <div class="option-row">
+        <input
+          type="text"
+          class="form-control option-text"
+          placeholder="Option text"
+        />
+        <label>
+          <input type="checkbox" class="option-correct" /> Correct
+        </label>
+        <button type="button" class="btn remove-option">Remove</button>
+      </div>
+    </template>
+
+    <script>
+      // Initialize variables
+      let questionCounter = 0;
+
+      // DOM elements
+      const questionsContainer = document.getElementById("questions-container");
+      const addQuestionBtn = document.getElementById("add-question");
+      const questionsDataInput = document.getElementById("questions-data");
+      const quizForm = document.getElementById("quizForm");
+
+      // Templates
+      const questionTemplate = document.getElementById("question-template");
+      const optionTemplate = document.getElementById("option-template");
+
+      // Add question handler
+      addQuestionBtn.addEventListener("click", addQuestion);
+
+      // Submit form handler
+      quizForm.addEventListener("submit", prepareFormData);
+
+      // Add first question automatically
+      addQuestion();
+
+      function addQuestion() {
+        const questionId = questionCounter++;
+        const questionNode = document.importNode(
+          questionTemplate.content,
+          true
+        );
+
+        // Set unique IDs for true/false radio buttons
+        const radioButtons = questionNode.querySelectorAll(
+          'input[type="radio"]'
+        );
+        radioButtons.forEach((radio) => {
+          radio.name = radio.name.replace("QUESTIONID", questionId);
+        });
+
+        // Add event listeners
+        const questionType = questionNode.querySelector(".question-type");
+        questionType.addEventListener("change", function () {
+          toggleQuestionType(this);
+        });
+
+        const addOptionBtn = questionNode.querySelector(".add-option");
+        addOptionBtn.addEventListener("click", function () {
+          addOption(
+            this.closest(".question-container").querySelector(
+              ".options-container"
+            )
+          );
+        });
+
+        const removeQuestionBtn =
+          questionNode.querySelector(".remove-question");
+        removeQuestionBtn.addEventListener("click", function () {
+          this.closest(".question-container").remove();
+        });
+
+        // Add first option for multiple choice
+        const optionsContainer =
+          questionNode.querySelector(".options-container");
+        addOption(optionsContainer);
+
+        // Append to container
+        questionsContainer.appendChild(questionNode);
+      }
+
+      function addOption(container) {
+        const optionNode = document.importNode(optionTemplate.content, true);
+
+        // Add event listener to remove button
+        const removeBtn = optionNode.querySelector(".remove-option");
+        removeBtn.addEventListener("click", function () {
+          this.closest(".option-row").remove();
+        });
+
+        container.appendChild(optionNode);
+      }
+
+      function toggleQuestionType(select) {
+        const questionContainer = select.closest(".question-container");
+        const multipleChoiceOptions = questionContainer.querySelector(
+          ".multiple-choice-options"
+        );
+        const trueFalseOptions = questionContainer.querySelector(
+          ".true-false-options"
+        );
+        const shortAnswerOption = questionContainer.querySelector(
+          ".short-answer-option"
+        );
+
+        // Hide all
+        multipleChoiceOptions.classList.add("hidden");
+        trueFalseOptions.classList.add("hidden");
+        shortAnswerOption.classList.add("hidden");
+
+        // Show selected
+        switch (select.value) {
+          case "multiple-choice":
+            multipleChoiceOptions.classList.remove("hidden");
+            break;
+          case "true-false":
+            trueFalseOptions.classList.remove("hidden");
+            break;
+          case "short-answer":
+            shortAnswerOption.classList.remove("hidden");
+            break;
+        }
+      }
+
+      function prepareFormData(e) {
+        e.preventDefault();
+
+        const questions = [];
+
+        // Process each question
+        document
+          .querySelectorAll(".question-container")
+          .forEach((container) => {
+            const questionText =
+              container.querySelector(".question-text").value;
+            const questionType =
+              container.querySelector(".question-type").value;
+            const points = parseInt(
+              container.querySelector(".question-points").value
+            );
+
+            const question = {
+              questionText,
+              questionType,
+              points,
+              options: [],
+            };
+
+            // Process options based on question type
+            if (questionType === "multiple-choice") {
+              container.querySelectorAll(".option-row").forEach((row) => {
+                const optionText = row.querySelector(".option-text").value;
+                // Don't add empty options
+                if (optionText.trim()) {
+                  question.options.push({
+                    optionText: optionText,
+                    isCorrect: row.querySelector(".option-correct").checked,
+                  });
+                }
+              });
+
+              // Ensure at least one option is selected as correct for multiple choice
+              const hasCorrectOption = question.options.some(
+                (opt) => opt.isCorrect
+              );
+              if (question.options.length > 0 && !hasCorrectOption) {
+                question.options[0].isCorrect = true; // Set first option as correct if none selected
+              }
+            } else if (questionType === "true-false") {
+              const trueRadio = container.querySelector('input[value="true"]');
+              const isTrueCorrect = trueRadio.checked;
+
+              question.options.push({
+                optionText: "True",
+                isCorrect: isTrueCorrect,
+              });
+              question.options.push({
+                optionText: "False",
+                isCorrect: !isTrueCorrect,
+              });
+            } else if (questionType === "short-answer") {
+              question.correctAnswer =
+                container.querySelector(".correct-answer").value || "";
+            }
+
+            // Add question to array if it has text
+            if (questionText.trim()) {
+              questions.push(question);
+            }
+          });
+
+        // Validation - ensure we have at least one question
+        if (questions.length === 0) {
+          alert("Please add at least one question to your quiz.");
+          return;
+        }
+
+        console.log("Submitting questions:", questions);
+
+        try {
+          // Set the questions data in the hidden input
+          questionsDataInput.value = JSON.stringify(questions);
+
+          // Submit the form
+          quizForm.submit();
+        } catch (error) {
+          console.error("Error preparing form data:", error);
+          alert(
+            "There was an error preparing your quiz data. Please try again."
+          );
+        }
+      }
+    </script>
 
     <%- include('../partials/footer') %>
   </body>

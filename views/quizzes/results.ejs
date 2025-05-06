@@ -1,0 +1,90 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+  <div class="results-summary text-center">
+    <h1>Quiz Results</h1>
+    <h2><%= quiz.title %></h2>
+
+    <div class="score-circle"><%= percentage %>%</div>
+
+    <p class="lead">You scored <%= score %> out of <%= maxScore %> points</p>
+
+    <div class="mt-4">
+      <a href="/quiz/<%= quiz._id %>" class="btn btn-secondary"
+        >View Quiz Details</a
+      >
+      <a href="/quiz/browse" class="btn btn-primary">Find More Quizzes</a>
+
+      <% if (user) { %>
+      <a href="/user/dashboard" class="btn btn-outline">Back to Dashboard</a>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="card mt-5">
+    <div class="card-body">
+      <h3>Question Results</h3>
+
+      <div class="question-results">
+        <% quiz.questions.forEach((question, index) => { %>
+        <div
+          class="card mb-3 <%= attempt.answers[index].isCorrect ? 'border-success' : 'border-danger' %>"
+        >
+          <div class="card-body">
+            <h4>
+              Question <%= index + 1 %> <% if (attempt.answers[index].isCorrect)
+              { %>
+              <span class="text-success">✓ Correct</span>
+              <% } else { %>
+              <span class="text-danger">✗ Incorrect</span>
+              <% } %>
+            </h4>
+
+            <p><%= question.questionText %></p>
+
+            <% if (question.questionType === 'multiple-choice' ||
+            question.questionType === 'true-false') { %>
+            <div class="options-list">
+              <% question.options.forEach(option => { %>
+              <div class="option">
+                <% const isSelected =
+                attempt.answers[index].selectedOptions.some( id => id.toString()
+                === option._id.toString() ); const isCorrect = option.isCorrect;
+                let optionClass = ''; if (isSelected && isCorrect) optionClass =
+                'text-success font-weight-bold'; else if (isSelected &&
+                !isCorrect) optionClass = 'text-danger'; else if (!isSelected &&
+                isCorrect) optionClass = 'text-success'; %>
+                <span class="<%= optionClass %>">
+                  <%= option.optionText %> <% if (isSelected) { %> (Your answer)
+                  <% } %> <% if (isCorrect) { %> (Correct answer) <% } %>
+                </span>
+              </div>
+              <% }); %>
+            </div>
+            <% } else if (question.questionType === 'short-answer') { %>
+            <div>
+              <p>
+                Your answer:
+                <strong><%= attempt.answers[index].textAnswer %></strong>
+              </p>
+              <p>
+                Correct answer: <strong><%= question.correctAnswer %></strong>
+              </p>
+            </div>
+            <% } %>
+
+            <div class="mt-2">
+              <small
+                >Points: <%= attempt.answers[index].pointsAwarded %> of <%=
+                question.points %></small
+              >
+            </div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

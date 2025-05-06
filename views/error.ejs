@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Error - QuizVerse</title>
+    <title><%= title %></title>
     <link
       href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"
       rel="stylesheet"
@@ -18,32 +18,52 @@
         margin: 0 auto;
       }
 
-      .error-code {
-        font-size: 6rem;
-        font-weight: bold;
-        color: var(--color-secondary);
-        margin-bottom: 20px;
-      }
-
       .error-message {
         font-size: 1.2rem;
         margin-bottom: 30px;
       }
 
-      .back-home {
-        display: inline-block;
+      .error-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
         margin-top: 20px;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        text-decoration: none;
+        background-color: var(--color-primary);
+        color: #fff;
+        border-radius: 5px;
       }
     </style>
   </head>
   <body>
-    <div class="error-container">
-      <div class="error-code">Oops!</div>
-      <h1>Something went wrong</h1>
-      <div class="error-message">
-        <p><%= message %></p>
+    <%- include('./partials/header') %>
+
+    <div class="container">
+      <div class="error-container">
+        <h1><%= title %></h1>
+        <div class="error-message">
+          <p><%= message %></p>
+        </div>
+        <div class="error-actions">
+          <a href="javascript:history.back()" class="btn">Go Back</a>
+          <a href="/" class="btn">Go to Homepage</a>
+          <% if (title.includes("Authentication")) { %>
+          <a href="/auth/login" class="btn">Login</a>
+          <% } %>
+        </div>
       </div>
-      <a href="/" class="btn back-home">Back to Home</a>
     </div>
+
+    <%- include('./partials/footer') %>
+
+    <script>
+      // Check if authentication cookie exists
+      console.log("Cookie exists:", document.cookie.includes("token"));
+    </script>
   </body>
 </html>

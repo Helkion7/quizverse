@@ -41,29 +41,33 @@ exports.postLogin = async (req, res) => {
       });
     }
 
-    // Generate JWT
+    // Create token with user ID and role
     const token = jwt.sign(
       {
         id: user._id,
         username: user.username,
+        email: user.email,
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "1d" }
     );
 
-    // Set JWT in HTTP-only cookie
-    res.cookie("jwt", token, {
+    // Set cookie with more secure options
+    res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: "lax", // Helps with CSRF protection
     });
+
+    console.log("User logged in:", user.username, "Role:", user.role);
 
     // Redirect based on role
     if (user.role === "admin") {
-      res.redirect("/admin/dashboard");
+      return res.redirect("/admin/dashboard");
     } else {
-      res.redirect("/user/dashboard");
+      return res.redirect("/user/dashboard");
     }
   } catch (error) {
     console.error("Login error:", error);

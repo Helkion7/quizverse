@@ -1,0 +1,111 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+  <div class="card mb-4">
+    <div class="card-body">
+      <h1 class="card-title"><%= quiz.title %></h1>
+      <p class="card-text">
+        <%= quiz.description || 'No description provided' %>
+      </p>
+      <div class="text-muted mb-3">
+        <small>
+          Created by <%= quiz.creator ? quiz.creator.username : 'Unknown' %> •
+          <%= quiz.questions.length %> questions • <%= quiz.attempts %> attempts
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <form action="/quiz/<%= quiz._id %>/submit" method="POST" id="quizForm">
+    <% quiz.questions.forEach((question, questionIndex) => { %>
+    <div class="card mb-4 question-card">
+      <div class="card-body">
+        <h3 class="card-title">Question <%= questionIndex + 1 %></h3>
+        <p class="card-text"><%= question.questionText %></p>
+
+        <div class="question-options">
+          <% if (question.questionType === 'multiple-choice') { %>
+          <div class="form-group">
+            <% question.options.forEach((option, optionIndex) => { %>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                name="answers[<%= questionIndex %>]"
+                value="<%= option._id %>"
+                id="question<%= questionIndex %>_option<%= optionIndex %>"
+              />
+              <label
+                class="form-check-label"
+                for="question<%= questionIndex %>_option<%= optionIndex %>"
+              >
+                <%= option.optionText %>
+              </label>
+            </div>
+            <% }); %>
+          </div>
+          <% } else if (question.questionType === 'true-false') { %>
+          <div class="form-group">
+            <% question.options.forEach((option, optionIndex) => { %>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="answers[<%= questionIndex %>]"
+                value="<%= option._id %>"
+                id="question<%= questionIndex %>_option<%= optionIndex %>"
+                required
+              />
+              <label
+                class="form-check-label"
+                for="question<%= questionIndex %>_option<%= optionIndex %>"
+              >
+                <%= option.optionText %>
+              </label>
+            </div>
+            <% }); %>
+          </div>
+          <% } else if (question.questionType === 'short-answer') { %>
+          <div class="form-group">
+            <input
+              type="text"
+              class="form-control"
+              name="answers[<%= questionIndex %>]"
+              placeholder="Your answer"
+              required
+            />
+          </div>
+          <% } %>
+        </div>
+
+        <div class="text-muted mt-2">
+          <small>Points: <%= question.points %></small>
+        </div>
+      </div>
+    </div>
+    <% }); %>
+
+    <div class="form-group text-center mb-5">
+      <button type="submit" class="btn btn-primary btn-lg">
+        Submit Answers
+      </button>
+      <a href="/quiz/<%= quiz._id %>" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Add this script to fix multiple checkbox submissions
+  document.getElementById("quizForm").addEventListener("submit", function (e) {
+    // No need to prevent default - let the form submit normally
+
+    // Check console for debugging info
+    console.log("Form being submitted");
+
+    // Get all checkbox groups
+    const checkboxGroups = document.querySelectorAll('input[type="checkbox"]');
+    console.log("Found checkbox groups:", checkboxGroups.length);
+  });
+</script>
+
+<%- include('../partials/footer') %>

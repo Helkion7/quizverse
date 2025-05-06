@@ -40,17 +40,24 @@ app.set("views", path.join(__dirname, "views"));
 
 // Replace session user middleware with JWT verification
 app.use((req, res, next) => {
-  const token = req.cookies.jwt;
+  const token = req.cookies.token;
+  console.log("JWT middleware - Token exists:", !!token);
+
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log("JWT decoded:", decoded.id);
+
       req.user = decoded;
       res.locals.user = decoded;
     } catch (err) {
+      console.error("JWT verification error:", err.message);
       res.locals.user = null;
+      req.user = null;
     }
   } else {
     res.locals.user = null;
+    req.user = null;
   }
   next();
 });
@@ -65,16 +72,18 @@ app.use("/", staticRoutes);
 // Error handling middleware
 app.use((req, res, next) => {
   res.status(404).render("error", {
+    title: "Page Not Found",
     error: "Page not found",
-    message: "Page not found",
+    message: "The page you're looking for doesn't exist.",
   });
 });
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).render("error", {
+    title: "Server Error",
     error: "Something went wrong!",
-    message: "Something went wrong!",
+    message: "Something went wrong on our end. Please try again later.",
   });
 });
 
