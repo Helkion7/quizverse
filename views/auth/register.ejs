@@ -4,37 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>QuizVerse - Register</title>
-    <link rel="stylesheet" href="/css/main.css" />
   </head>
   <body>
-    <div class="auth-container">
-      <div class="auth-card">
-        <div class="auth-header">
-          <h1>Join QuizVerse</h1>
-          <p>Create an account to start creating and taking quizzes</p>
+    <div>
+      <div>
+        <div>
+          <h1>Create an Account</h1>
+          <p>Please fill out the form below to register</p>
         </div>
 
-        <% if (error) { %>
-        <div class="alert alert-danger"><%= error %></div>
+        <% if (typeof error !== 'undefined') { %>
+        <div><%= error %></div>
         <% } %>
 
-        <form action="/auth/register" method="POST" class="auth-form">
-          <div class="form-group">
+        <form action="/auth/register" method="POST">
+          <div>
             <label for="username">Username</label>
             <input type="text" id="username" name="username" required />
           </div>
-
-          <div class="form-group">
+          <div>
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required />
           </div>
-
-          <div class="form-group">
+          <div>
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required />
           </div>
-
-          <div class="form-group">
+          <div>
             <label for="confirmPassword">Confirm Password</label>
             <input
               type="password"
@@ -43,13 +39,12 @@
               required
             />
           </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Register</button>
+          <div>
+            <button type="submit">Register</button>
           </div>
         </form>
 
-        <div class="auth-footer">
+        <div>
           <p>Already have an account? <a href="/auth/login">Login</a></p>
         </div>
       </div>

@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
-    <link rel="stylesheet" href="/css/main.css" />
   </head>
   <body>
     <div class="container">
@@ -15,7 +14,13 @@
         <p><strong>Email:</strong> <%= user.email %></p>
         <p><strong>Role:</strong> <%= user.role %></p>
       </div>
-      <a href="/user/dashboard" class="btn">Back to Dashboard</a>
+      <div>
+        <% if (isAuthenticated) { %>
+        <a href="/user/dashboard">Back to Dashboard</a>
+        <% } else { %>
+        <a href="/auth/login">Login</a>
+        <% } %>
+      </div>
       <% } else { %>
       <p>You need to be logged in to view this page.</p>
       <a href="/auth/login" class="btn">Login</a>
