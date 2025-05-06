@@ -1,19 +1,17 @@
-// Check if user is authenticated
-const isAuthenticated = (req, res, next) => {
-  if (!req.session.user) {
+const jwt = require("jsonwebtoken");
+
+exports.isAuthenticated = (req, res, next) => {
+  if (!req.user) {
     return res.redirect("/auth/login");
   }
   next();
 };
 
-// Check if user is an admin
-const isAdmin = (req, res, next) => {
-  if (!req.session.user || req.session.user.role !== "admin") {
-    return res
-      .status(403)
-      .render("error", { error: "Unauthorized: Admin access required" });
+exports.isAdmin = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).render("error", {
+      message: "You don't have permission to access this page",
+    });
   }
   next();
 };
-
-module.exports = { isAuthenticated, isAdmin };

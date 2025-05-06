@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>User Dashboard</h1>
+      <% if (user) { %>
+      <p>Welcome, <%= user.username %></p>
+      <div class="dashboard-actions">
+        <a href="/quiz/browse" class="btn">Browse Quizzes</a>
+        <a href="/quiz/create" class="btn">Create a Quiz</a>
+        <a href="/user/profile" class="btn">My Profile</a>
+        <a href="/auth/logout" class="btn">Logout</a>
+      </div>
+      <% } else { %>
+      <p>You need to be logged in to view this page.</p>
+      <a href="/auth/login" class="btn">Login</a>
+      <% } %>
+    </div>
+  </body>
+</html>
