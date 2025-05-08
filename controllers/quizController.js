@@ -2,24 +2,28 @@ const Quiz = require("../models/Quiz");
 const User = require("../models/User");
 const QuizAttempt = require("../models/QuizAttempt");
 
+// Add this helper function to be reused by other routes
+exports.getQuizzes = async () => {
+  try {
+    const quizzes = await Quiz.find().sort({ createdAt: -1 }).limit(10);
+    return quizzes;
+  } catch (error) {
+    console.error("Error fetching quizzes:", error);
+    throw error;
+  }
+};
+
 // Display quiz browse page
 exports.getBrowse = async (req, res) => {
   try {
-    // Fetch all quizzes, sort by creation date (newest first)
-    const quizzes = await Quiz.find({})
-      .sort({ createdAt: -1 })
-      .populate("creator", "username")
-      .exec();
-
+    const quizzes = await exports.getQuizzes();
     res.render("quizzes/browse", {
       title: "Browse Quizzes",
       quizzes: quizzes,
     });
   } catch (error) {
-    console.error("Error fetching quizzes:", error);
-    res.status(500).render("error", {
-      message: "Failed to load quizzes. Please try again later.",
-    });
+    console.error("Error in getBrowse:", error);
+    res.status(500).render("error", { error: "Failed to load quizzes" });
   }
 };
 
@@ -165,7 +169,7 @@ exports.postCreate = async (req, res) => {
 };
 
 // Display quiz details
-exports.getDetails = async (req, res) => {
+exports.getQuizDetails = async (req, res) => {
   try {
     const quizId = req.params.id;
     console.log("Getting quiz details for ID:", quizId);
@@ -388,4 +392,11 @@ exports.postSubmit = async (req, res) => {
       message: "Failed to process quiz submission. Please try again later.",
     });
   }
+};
+
+// Add this new controller method
+exports.authRequiredForQuiz = (req, res) => {
+  const quizId = req.params.id;
+  // Redirect to login with return URL to the quiz
+  res.redirect(`/auth/login?returnTo=/quiz/${quizId}`);
 };

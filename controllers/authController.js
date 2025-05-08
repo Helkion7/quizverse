@@ -63,11 +63,14 @@ exports.postLogin = async (req, res) => {
 
     console.log("User logged in:", user.username, "Role:", user.role);
 
+    // After successful login, check if there's a returnTo URL
+    const returnTo = req.query.returnTo || "/user/dashboard";
+
     // Redirect based on role
     if (user.role === "admin") {
       return res.redirect("/admin/dashboard");
     } else {
-      return res.redirect("/user/dashboard");
+      return res.redirect(returnTo);
     }
   } catch (error) {
     console.error("Login error:", error);

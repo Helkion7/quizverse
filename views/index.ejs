@@ -8,45 +8,50 @@
   <body>
     <%- include('partials/header') %>
 
-    <div class="hero">
+    <main class="container">
       <h1>Welcome to QuizVerse</h1>
-      <p>Your interactive quiz platform for learning and fun</p>
+      <p>Explore our collection of community-created quizzes</p>
 
-      <div class="actions">
-        <% if (user) { %>
-        <a
-          href="<%= user && user.role === 'admin' ? '/admin/dashboard' : '/user/dashboard' %>"
-          class="btn btn-primary"
-          >Go to Dashboard</a
-        >
-        <% } else { %>
-        <a href="/auth/login" class="btn btn-primary">Login</a>
-        <a href="/auth/register" class="btn">Register</a>
-        <% } %>
-      </div>
+      <section class="quizzes-section">
+        <h2>Featured Quizzes</h2>
 
-      <div class="featured-quizzes">
-        <h2>Popular Quizzes</h2>
-        <div class="quiz-list">
-          <div class="card animate-fade-in">
-            <h3>Programming Basics</h3>
-            <p>Test your knowledge of programming fundamentals</p>
-            <div class="quiz-meta">
-              <span>15 questions</span>
-              <span>500+ attempts</span>
+        <div class="quizzes-grid">
+          <% if (quizzes && quizzes.length > 0) { %> <% quizzes.forEach(quiz =>
+          { %>
+          <div class="quiz-item slide-in">
+            <div class="quiz-content">
+              <h3><%= quiz.title %></h3>
+              <p><%= quiz.description || 'No description available' %></p>
+              <div class="quiz-meta">
+                <span
+                  ><%= quiz.questions ? quiz.questions.length : 0 %>
+                  questions</span
+                >
+                <% if(quiz.author) { %>
+                <span>By: <%= quiz.author.username || 'Anonymous' %></span>
+                <% } %>
+              </div>
             </div>
+            <a
+              href="<%= user ? `/quiz/${quiz._id}` : `/quiz/auth-required/${quiz._id}` %>"
+              class="quiz-link"
+            >
+              <span class="view-quiz-btn">View Quiz</span>
+            </a>
+            <a href="/quiz/auth-check/<%= quiz._id %>" class="view-quiz-btn">
+              View Quiz
+            </a>
           </div>
-          <div class="card animate-fade-in">
-            <h3>Web Development</h3>
-            <p>Challenge yourself with HTML, CSS and JavaScript questions</p>
-            <div class="quiz-meta">
-              <span>20 questions</span>
-              <span>300+ attempts</span>
-            </div>
-          </div>
+          <% }) %> <% } else { %>
+          <p class="no-quizzes">No quizzes available at the moment.</p>
+          <% } %>
         </div>
-      </div>
-    </div>
+
+        <div class="view-all">
+          <a href="/quiz/browse" class="btn-minimal">View All Quizzes</a>
+        </div>
+      </section>
+    </main>
 
     <%- include('partials/footer') %>
   </body>

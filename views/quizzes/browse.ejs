@@ -31,9 +31,12 @@
                     Date(quiz.createdAt).toLocaleDateString() %>
                   </small>
                 </p>
-                <a href="/quiz/<%= quiz._id %>" class="btn btn-primary"
-                  >View Quiz</a
+                <a
+                  href="/quiz/auth-check/<%= quiz._id %>"
+                  class="view-quiz-btn"
                 >
+                  View Quiz
+                </a>
               </div>
             </div>
           </div>

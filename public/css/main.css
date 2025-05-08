@@ -137,6 +137,45 @@ a:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Matte Black Styled Button for Viewing Quizzes */
+.view-quiz-btn {
+  background-color: oklch(0.05 0.01 250);
+  color: oklch(0.9 0.02 250);
+  border: 1px solid oklch(0.2 0.01 250);
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 200;
+  letter-spacing: -0.025em;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 12px;
+}
+
+.view-quiz-btn:hover {
+  background-color: oklch(0.1 0.01 250);
+  border-color: oklch(0.7 0.05 280);
+}
+
+.view-quiz-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px oklch(0.7 0.05 280);
+}
+
+.view-quiz-btn {
+  animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Navigation */
 .navbar {
   display: flex;
