@@ -6,7 +6,7 @@
     <title>QuizVerse - <%= typeof title !== 'undefined' ? title : 'Interactive Quizzes' %></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -18,10 +18,19 @@
                 <button class="hamburger" id="hamburger-menu">☰</button>
                 <ul class="navbar-nav" id="navbarNav">
                     <li><a href="/">Home</a></li>
-                    <li><a href="/quizzes">Quizzes</a></li>
-                    <li><a href="/categories">Categories</a></li>
-                    <li><a href="/about">About</a></li>
-                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/quiz/browse">Quizzes</a></li>
+                    <li><a href="/faq">FAQ</a></li>
+                    <% if (locals.user) { %>
+                        <li><a href="/user/dashboard">Dashboard</a></li>
+                        <li><a href="/user/profile">Profile</a></li>
+                        <% if (locals.user.role === 'admin') { %>
+                            <li><a href="/admin/dashboard">Admin</a></li>
+                        <% } %>
+                        <li><a href="/auth/logout">Logout</a></li>
+                    <% } else { %>
+                        <li><a href="/auth/login">Login</a></li>
+                        <li><a href="/auth/register">Register</a></li>
+                    <% } %>
                 </ul>
             </nav>
         </div>
