@@ -146,6 +146,6 @@ exports.postRegister = async (req, res) => {
 
 // Process logout
 exports.logout = (req, res) => {
-  res.clearCookie("jwt");
+  res.clearCookie("token"); // Change from 'jwt' to 'token' to match what you set
   res.redirect("/auth/login");
 };

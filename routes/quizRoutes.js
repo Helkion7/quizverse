@@ -25,10 +25,32 @@ router.get("/auth-required/:id", quizController.authRequiredForQuiz);
 
 // Add route for authentication check
 router.get("/auth-check/:id", (req, res) => {
-  if (req.isAuthenticated()) {
-    res.redirect(`/quiz/${req.params.id}`);
-  } else {
-    res.redirect(`/auth/login?returnTo=/quiz/${req.params.id}`);
+  try {
+    const quizId = req.params.id;
+
+    if (!quizId) {
+      console.error("No quiz ID provided");
+      return res.status(400).render("error", {
+        title: "Error",
+        message: "Invalid quiz ID provided.",
+      });
+    }
+
+    console.log("Auth check for quiz ID:", quizId);
+
+    if (req.isAuthenticated()) {
+      console.log("User is authenticated, redirecting to quiz");
+      return res.redirect(`/quiz/${quizId}`);
+    } else {
+      console.log("User is not authenticated, redirecting to login");
+      return res.redirect(`/auth/login?returnTo=/quiz/${quizId}`);
+    }
+  } catch (error) {
+    console.error("Error in auth-check route:", error);
+    return res.status(500).render("error", {
+      title: "Server Error",
+      message: "An unexpected error occurred. Please try again later.",
+    });
   }
 });
 

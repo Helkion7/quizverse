@@ -2,10 +2,11 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 exports.isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
+  if (req.user) {
     return next();
   }
   // Store the URL they were trying to access
+  req.session = req.session || {};
   req.session.returnTo = req.originalUrl;
   // Redirect to login
   res.redirect("/auth/login");

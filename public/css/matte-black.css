@@ -1,0 +1,257 @@
+:root {
+  --color-background: oklch(0.05 0.01 250);
+  --color-text-primary: oklch(0.9 0.02 250);
+  --color-text-secondary: oklch(0.6 0.01 250);
+  --color-accent: oklch(0.7 0.05 280);
+  --color-border: oklch(0.2 0.01 250);
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+}
+
+/* Typography */
+h1 {
+  font-size: 1.25rem;
+  font-weight: 200;
+  color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.125rem;
+  font-weight: 300;
+  color: var(--color-text-primary);
+  margin: 0 0 16px 0;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin: 0 0 8px 0;
+}
+
+p {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Layout */
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.quizzes-section {
+  margin-top: 24px;
+}
+
+.quizzes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Quiz Item */
+.quiz-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: oklch(0.08 0.01 250);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  padding: 12px;
+  transition: background-color var(--transition-fast);
+}
+
+.quiz-item:hover {
+  background-color: oklch(0.1 0.01 250);
+}
+
+.quiz-content {
+  flex: 1;
+}
+
+.quiz-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+/* Interactive Elements */
+input {
+  width: 100%;
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 0;
+  transition: border-color var(--transition-fast);
+}
+
+input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}
+
+button {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 8px;
+  transition: color var(--transition-fast);
+}
+
+button:hover {
+  color: var(--color-accent);
+}
+
+.quiz-link {
+  text-decoration: none;
+  align-self: flex-end;
+  margin-top: 12px;
+}
+
+.view-quiz-btn {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.view-quiz-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn-minimal {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 8px;
+  transition: color var(--transition-fast);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-minimal:hover {
+  color: var(--color-accent);
+}
+
+.view-all {
+  margin-top: 16px;
+  text-align: center;
+}
+
+/* For accessibility */
+button:focus,
+input:focus {
+  outline: none;
+}
+
+/* Icons */
+.icon {
+  color: var(--color-accent);
+  width: 16px;
+  height: 16px;
+  stroke-width: 1;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.icon:hover {
+  opacity: 1;
+}
+
+/* Animation */
+.fade-in {
+  animation: fadeIn var(--transition-fast);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.slide-in {
+  animation: slideIn var(--transition-fast);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Accessibility */
+:focus {
+  outline: none;
+}
+
+.focus-container:focus-within {
+  box-shadow: 0 0 0 1px var(--color-accent);
+  transition: box-shadow var(--transition-fast);
+}
+
+.interactive-element {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+@media (forced-colors: active) {
+  .quiz-item {
+    border-color: CanvasText;
+  }
+
+  .icon {
+    forced-color-adjust: auto;
+  }
+}
+
+@media (min-width: 768px) {
+  .quizzes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .quiz-item {
+    flex-direction: column;
+    height: auto;
+    padding: 12px;
+  }
+
+  .quiz-link {
+    margin-top: 12px;
+    align-self: flex-end;
+  }
+}

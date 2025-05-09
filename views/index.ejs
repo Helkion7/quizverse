@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
+    <link rel="stylesheet" href="/css/matte-black.css" />
   </head>
   <body>
     <%- include('partials/header') %>
@@ -32,14 +33,8 @@
                 <% } %>
               </div>
             </div>
-            <a
-              href="<%= user ? `/quiz/${quiz._id}` : `/quiz/auth-required/${quiz._id}` %>"
-              class="quiz-link"
-            >
+            <a href="/quiz/<%= quiz._id %>" class="quiz-link">
               <span class="view-quiz-btn">View Quiz</span>
-            </a>
-            <a href="/quiz/auth-check/<%= quiz._id %>" class="view-quiz-btn">
-              View Quiz
             </a>
           </div>
           <% }) %> <% } else { %>
