@@ -350,7 +350,8 @@ exports.postSubmit = async (req, res) => {
     // Create a new quiz attempt
     const attempt = new QuizAttempt({
       quiz: quizId,
-      user: req.user ? req.user._id || req.user.id : null,
+      // Only include user field if user is authenticated
+      ...(req.user && { user: req.user._id || req.user.id }),
       answers: parsedAnswers,
       totalScore,
       maxPossibleScore,

@@ -38,7 +38,8 @@ const QuizAttemptSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    // Making the user field optional for anonymous quiz attempts
+    required: false,
   },
   answers: [AnswerSchema],
   totalScore: {
