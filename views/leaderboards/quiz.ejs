@@ -1,0 +1,54 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <div class="card leaderboard-card fade-in">
+    <h1><%= quiz.title %> Leaderboard</h1>
+    <p class="quiz-description"><%= quiz.description %></p>
+
+    <div class="period-filter">
+      <a href="?period=weekly" class="period-btn <%= period === 'weekly' ? 'active' : '' %>">Weekly</a>
+      <a href="?period=monthly" class="period-btn <%= period === 'monthly' ? 'active' : '' %>">Monthly</a>
+      <a href="?period=all-time" class="period-btn <%= period === 'all-time' ? 'active' : '' %>">All-time</a>
+    </div>
+
+    <div class="leaderboard-table-container">
+      <% if (leaderboard && leaderboard.length > 0) { %>
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>User</th>
+              <th>Score</th>
+              <th>Date</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% leaderboard.forEach((entry, index) => { %>
+              <tr class="leaderboard-row slide-in" style="animation-delay: <%= index * 0.03 %>s">
+                <td class="rank-cell"><%= index + 1 %></td>
+                <td class="username-cell"><%= entry.username %></td>
+                <td class="score-cell"><%= entry.score %>%</td>
+                <td class="date-cell"><%= new Date(entry.completedAt).toLocaleDateString() %></td>
+                <td class="time-cell"><%= entry.timeSpent ? Math.round(entry.timeSpent / 1000) + 's' : '-' %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <div class="no-results">
+          <p>No leaderboard data available for this quiz yet.</p>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="leaderboard-actions">
+      <a href="/leaderboard?period=all-time" class="btn-minimal">Global</a>
+      <a href="/quiz/browse" class="btn-minimal">Quiz Leaderboards</a>
+      <a href="/quiz/<%= quiz._id %>" class="btn-minimal">Take Quiz</a>
+      <a href="/user/dashboard" class="btn-minimal">Dashboard</a>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

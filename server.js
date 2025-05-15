@@ -12,6 +12,7 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const staticRoutes = require("./routes/staticRoutes");
+const leaderboardRoutes = require("./routes/leaderboardRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -69,6 +70,7 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/admin", adminRoutes);
 app.use("/quiz", quizRoutes);
+app.use("/leaderboard", leaderboardRoutes);
 app.use("/", staticRoutes);
 
 // Error handling middleware

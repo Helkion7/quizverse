@@ -1,0 +1,127 @@
+:root {
+  --color-background: oklch(0.05 0.01 250);
+  --color-text-primary: oklch(0.9 0.02 250);
+  --color-text-secondary: oklch(0.6 0.01 250);
+  --color-accent: oklch(0.7 0.05 280);
+  --color-border: oklch(0.2 0.01 250);
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.leaderboard-card {
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  padding: 16px;
+  transition: background-color var(--transition-fast);
+  margin-bottom: 16px;
+}
+
+.period-filter {
+  display: flex;
+  margin: 16px 0;
+}
+
+.period-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 8px 12px;
+  margin-right: 8px;
+  transition: color var(--transition-fast);
+  text-decoration: none;
+}
+
+.period-btn:hover {
+  color: var(--color-accent);
+}
+
+.period-btn.active {
+  color: var(--color-accent);
+  border-bottom: 1px solid var(--color-accent);
+}
+
+.leaderboard-table-container {
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.leaderboard-table thead th {
+  text-align: left;
+  padding: 8px;
+  font-weight: 200;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.leaderboard-row {
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-fast);
+}
+
+.leaderboard-row:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.leaderboard-row td {
+  padding: 8px;
+  color: var(--color-text-primary);
+}
+
+.rank-cell {
+  width: 40px;
+}
+
+.score-cell {
+  color: var(--color-accent);
+}
+
+.leaderboard-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 16px;
+}
+
+.btn-minimal {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 8px 12px;
+  margin-right: 8px;
+  transition: color var(--transition-fast);
+  text-decoration: none;
+}
+
+.btn-minimal:hover {
+  color: var(--color-accent);
+}
+
+.no-results {
+  padding: 16px 0;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* Animation classes */
+.slide-in {
+  animation: slideIn var(--transition-fast);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-5px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

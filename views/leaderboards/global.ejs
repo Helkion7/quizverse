@@ -1,0 +1,67 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <div class="card leaderboard-card">
+    <h1>Global Leaderboard</h1>
+
+    <div class="period-filter">
+      <a
+        href="?period=weekly"
+        class="period-btn <%= period === 'weekly' ? 'active' : '' %>"
+        >Weekly</a
+      >
+      <a
+        href="?period=monthly"
+        class="period-btn <%= period === 'monthly' ? 'active' : '' %>"
+        >Monthly</a
+      >
+      <a
+        href="?period=all-time"
+        class="period-btn <%= period === 'all-time' ? 'active' : '' %>"
+        >All-time</a
+      >
+    </div>
+
+    <div class="leaderboard-table-container">
+      <% if (leaderboard && leaderboard.length > 0) { %>
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>User</th>
+            <th>Avg. Score</th>
+            <th>Quizzes</th>
+            <th>Best</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% leaderboard.forEach((entry, index) => { %>
+          <tr
+            class="leaderboard-row slide-in"
+            style="animation-delay: <%= index * 0.05 %>s"
+          >
+            <td class="rank-cell"><%= index + 1 %></td>
+            <td class="username-cell"><%= entry.username %></td>
+            <td class="score-cell"><%= entry.avgScore %>%</td>
+            <td class="quizzes-cell"><%= entry.totalQuizzes %></td>
+            <td class="best-cell"><%= entry.bestScore %>%</td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <% } else { %>
+      <div class="no-results">
+        <p>No leaderboard data available for this time period.</p>
+      </div>
+      <% } %>
+    </div>
+
+    <div class="leaderboard-actions">
+      <a href="/leaderboard?period=all-time" class="btn-minimal">Global</a>
+      <a href="/quiz/browse" class="btn-minimal">Quiz Leaderboards</a>
+      <a href="/user/dashboard" class="btn-minimal">Dashboard</a>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
