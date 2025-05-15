@@ -4,115 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
-    <style>
-      .question-container {
-        border: 1px solid var(--color-border);
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 0;
-      }
-      .options-container {
-        margin-left: 20px;
-      }
-      .option-row {
-        margin-bottom: 10px;
-      }
-      .hidden {
-        display: none;
-      }
-      .matching-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-      .matching-pair {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-      }
-      .matching-pair input {
-        flex: 1;
-      }
-      .matching-arrow {
-        margin: 0 8px;
-        color: var(--color-text-secondary);
-      }
-      .ordering-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-      }
-      .ordering-item input {
-        flex: 1;
-      }
-      .ordering-position {
-        width: 40px;
-        margin-right: 8px;
-      }
-      .blank-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-      }
-      .blank-item input {
-        flex: 1;
-      }
-      .blank-instruction {
-        font-size: 0.8em;
-        color: var(--color-text-secondary);
-        margin-bottom: 8px;
-      }
-      .image-selection-container {
-        margin-top: 12px;
-      }
-      .coordinate-inputs {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-        gap: 8px;
-        margin-bottom: 8px;
-      }
-      /* Custom radio styling for form groups */
-      .form-group input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-      }
-
-      .form-group input[type="radio"] + label {
-        position: relative;
-        padding-left: 28px;
-        cursor: pointer;
-        margin-right: 16px;
-        display: inline-block;
-      }
-
-      .form-group input[type="radio"] + label:before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 2px;
-        width: 18px;
-        height: 18px;
-        border: 1px solid var(--color-border);
-        border-radius: 50%;
-        background-color: transparent;
-        transition: all var(--transition-fast);
-      }
-
-      .form-group input[type="radio"]:checked + label:before {
-        border-color: var(--color-accent);
-      }
-
-      .form-group input[type="radio"]:checked + label:after {
-        content: "";
-        position: absolute;
-        left: 5px;
-        top: 7px;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: var(--color-accent);
-      }
-    </style>
+    <link rel="stylesheet" href="/css/quiz-create.css" />
   </head>
   <body>
     <%- include('../partials/header') %>
@@ -312,9 +204,14 @@
           class="form-control option-text"
           placeholder="Option text"
         />
-        <label>
-          <input type="checkbox" class="option-correct" /> Correct
-        </label>
+        <div class="form-group">
+          <input
+            type="checkbox"
+            class="option-correct"
+            id="option-correct-ID"
+          />
+          <label for="option-correct-ID">Correct</label>
+        </div>
         <button type="button" class="btn remove-option">Remove</button>
       </div>
     </template>
@@ -672,194 +569,115 @@
             const matchingContainer = questionContainer.querySelector(
               ".matching-container"
             );
-            if (matchingContainer.children.length === 0) {
-              addMatchingPair(matchingContainer);
-              addMatchingPair(matchingContainer);
-            }
             break;
           case "ordering":
             orderingOptions.classList.remove("hidden");
-            const orderingContainer = questionContainer.querySelector(
-              ".ordering-container"
-            );
-            if (orderingContainer.children.length === 0) {
-              addOrderingItem(orderingContainer);
-              addOrderingItem(orderingContainer);
-              addOrderingItem(orderingContainer);
-            }
             break;
           case "fill-in-blanks":
             fillInBlanksOptions.classList.remove("hidden");
-            const blanksContainer =
-              questionContainer.querySelector(".blanks-container");
-            if (blanksContainer.children.length === 0) {
-              addBlank(blanksContainer);
-            }
             break;
           case "image-selection":
             imageSelectionOptions.classList.remove("hidden");
-            const areasContainer = questionContainer.querySelector(
-              ".clickable-areas-container"
-            );
-            if (areasContainer.children.length === 0) {
-              addClickableArea(areasContainer);
-            }
             break;
         }
       }
 
-      function prepareFormData(e) {
-        e.preventDefault();
+      function prepareFormData(event) {
+        event.preventDefault();
 
         const questions = [];
+        const questionContainers = questionsContainer.querySelectorAll(
+          ".question-container"
+        );
 
-        document
-          .querySelectorAll(".question-container")
-          .forEach((container) => {
-            const questionText =
-              container.querySelector(".question-text").value;
-            const questionType =
-              container.querySelector(".question-type").value;
-            const points = parseInt(
-              container.querySelector(".question-points").value
-            );
+        questionContainers.forEach((container) => {
+          const questionText = container.querySelector(".question-text").value;
+          const questionType = container.querySelector(".question-type").value;
+          const questionPoints =
+            container.querySelector(".question-points").value;
 
-            const question = {
-              questionText,
-              questionType,
-              points,
-              options: [],
-            };
+          const questionData = {
+            text: questionText,
+            type: questionType,
+            points: questionPoints,
+          };
 
-            if (questionType === "multiple-choice") {
-              container.querySelectorAll(".option-row").forEach((row) => {
+          switch (questionType) {
+            case "multiple-choice":
+              const options = [];
+              const optionRows = container.querySelectorAll(".option-row");
+              optionRows.forEach((row) => {
                 const optionText = row.querySelector(".option-text").value;
-                if (optionText.trim()) {
-                  question.options.push({
-                    optionText: optionText,
-                    isCorrect: row.querySelector(".option-correct").checked,
-                  });
-                }
+                const isCorrect = row.querySelector(".option-correct").checked;
+                options.push({ text: optionText, correct: isCorrect });
               });
-
-              const hasCorrectOption = question.options.some(
-                (opt) => opt.isCorrect
-              );
-              if (question.options.length > 0 && !hasCorrectOption) {
-                question.options[0].isCorrect = true;
-              }
-            } else if (questionType === "true-false") {
-              const trueRadio = container.querySelector('input[value="true"]');
-              const isTrueCorrect = trueRadio.checked;
-
-              question.options.push({
-                optionText: "True",
-                isCorrect: isTrueCorrect,
-              });
-              question.options.push({
-                optionText: "False",
-                isCorrect: !isTrueCorrect,
-              });
-            } else if (questionType === "short-answer") {
-              question.correctAnswer =
-                container.querySelector(".correct-answer").value || "";
-            } else if (questionType === "matching") {
-              container.querySelectorAll(".matching-pair").forEach((pair) => {
+              questionData.options = options;
+              break;
+            case "true-false":
+              const trueFalseValue = container.querySelector(
+                'input[name^="true-false"]:checked'
+              )?.value;
+              questionData.correctAnswer = trueFalseValue;
+              break;
+            case "short-answer":
+              const correctAnswer =
+                container.querySelector(".correct-answer").value;
+              questionData.correctAnswer = correctAnswer;
+              break;
+            case "matching":
+              const pairs = [];
+              const matchingPairs =
+                container.querySelectorAll(".matching-pair");
+              matchingPairs.forEach((pair) => {
                 const item = pair.querySelector(".matching-item").value;
                 const match = pair.querySelector(".matching-match").value;
-
-                if (item.trim() && match.trim()) {
-                  question.options.push({
-                    optionText: item,
-                    matchTo: match,
-                    isCorrect: true,
-                  });
-                }
+                pairs.push({ item, match });
               });
-            } else if (questionType === "ordering") {
-              container.querySelectorAll(".ordering-item").forEach((item) => {
+              questionData.pairs = pairs;
+              break;
+            case "ordering":
+              const items = [];
+              const orderingItems =
+                container.querySelectorAll(".ordering-item");
+              orderingItems.forEach((item) => {
+                const position = item.querySelector(".ordering-position").value;
                 const text = item.querySelector(".ordering-text").value;
-                const position = parseInt(
-                  item.querySelector(".ordering-position").value
-                );
-
-                if (text.trim()) {
-                  question.options.push({
-                    optionText: text,
-                    orderPosition: position,
-                    isCorrect: true,
-                  });
-                }
+                items.push({ position, text });
               });
-
-              question.options.sort(
-                (a, b) => a.orderPosition - b.orderPosition
-              );
-            } else if (questionType === "fill-in-blanks") {
-              question.blankAnswers = [];
-              container.querySelectorAll(".blank-item").forEach((blank) => {
+              questionData.items = items;
+              break;
+            case "fill-in-blanks":
+              const blanks = [];
+              const blankItems = container.querySelectorAll(".blank-item");
+              blankItems.forEach((blank) => {
                 const answer = blank.querySelector(".blank-answer").value;
-                if (answer.trim()) {
-                  question.blankAnswers.push(answer);
-                }
+                blanks.push(answer);
               });
-            } else if (questionType === "image-selection") {
-              question.imageUrl = container.querySelector(".image-url").value;
-              question.imageCoordinates = [];
-
-              container.querySelectorAll(".clickable-area").forEach((area) => {
-                const x = parseInt(area.querySelector(".coord-x").value);
-                const y = parseInt(area.querySelector(".coord-y").value);
-                const width = parseInt(
-                  area.querySelector(".coord-width").value
-                );
-                const height = parseInt(
-                  area.querySelector(".coord-height").value
-                );
+              questionData.blanks = blanks;
+              break;
+            case "image-selection":
+              const imageUrl = container.querySelector(".image-url").value;
+              const clickableAreas = [];
+              const areaItems = container.querySelectorAll(".clickable-area");
+              areaItems.forEach((area) => {
+                const x = area.querySelector(".coord-x").value;
+                const y = area.querySelector(".coord-y").value;
+                const width = area.querySelector(".coord-width").value;
+                const height = area.querySelector(".coord-height").value;
                 const label = area.querySelector(".area-label").value;
-
-                if (
-                  !isNaN(x) &&
-                  !isNaN(y) &&
-                  !isNaN(width) &&
-                  !isNaN(height) &&
-                  label.trim()
-                ) {
-                  question.imageCoordinates.push({
-                    x,
-                    y,
-                    width,
-                    height,
-                    label,
-                  });
-                }
+                clickableAreas.push({ x, y, width, height, label });
               });
-            }
+              questionData.imageUrl = imageUrl;
+              questionData.clickableAreas = clickableAreas;
+              break;
+          }
 
-            if (questionText.trim()) {
-              questions.push(question);
-            }
-          });
+          questions.push(questionData);
+        });
 
-        if (questions.length === 0) {
-          alert("Please add at least one question to your quiz.");
-          return;
-        }
-
-        console.log("Submitting questions:", questions);
-
-        try {
-          questionsDataInput.value = JSON.stringify(questions);
-          quizForm.submit();
-        } catch (error) {
-          console.error("Error preparing form data:", error);
-          alert(
-            "There was an error preparing your quiz data. Please try again."
-          );
-        }
+        questionsDataInput.value = JSON.stringify(questions);
+        quizForm.submit();
       }
     </script>
-
-    <%- include('../partials/footer') %>
   </body>
 </html>
