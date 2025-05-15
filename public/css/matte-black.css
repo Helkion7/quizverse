@@ -12,7 +12,8 @@ body {
   color: var(--color-text-primary);
   margin: 0;
   padding: 0;
-  font-family: "JetBrains Mono", monospace;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
 }
 
 /* Typography */
@@ -47,7 +48,7 @@ p {
 /* Layout */
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 16px;
 }
@@ -162,6 +163,18 @@ button:hover {
   text-align: center;
 }
 
+/* Card styling */
+.card {
+  border: 1px solid var(--color-border);
+  padding: 16px;
+  margin-bottom: 16px;
+  transition: background-color var(--transition-fast);
+}
+
+.card:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
 /* For accessibility */
 button:focus,
 input:focus {
@@ -228,6 +241,10 @@ input:focus {
 
 @media (forced-colors: active) {
   .quiz-item {
+    border-color: CanvasText;
+  }
+
+  .card {
     border-color: CanvasText;
   }
 
