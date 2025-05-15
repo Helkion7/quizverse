@@ -27,7 +27,7 @@
           <% if (question.questionType === 'multiple-choice') { %>
           <div class="form-group">
             <% question.options.forEach((option, optionIndex) => { %>
-            <div class="form-check">
+            <div class="clickable-option">
               <input
                 class="form-check-input"
                 type="checkbox"
@@ -36,7 +36,6 @@
                 id="question<%= questionIndex %>_option<%= optionIndex %>"
               />
               <label
-                class="form-check-label"
                 for="question<%= questionIndex %>_option<%= optionIndex %>"
               >
                 <%= option.optionText %>
@@ -47,9 +46,8 @@
           <% } else if (question.questionType === 'true-false') { %>
           <div class="form-group">
             <% question.options.forEach((option, optionIndex) => { %>
-            <div class="form-check">
+            <div class="clickable-option">
               <input
-                class="form-check-input"
                 type="radio"
                 name="answers[<%= questionIndex %>]"
                 value="<%= option._id %>"
@@ -57,7 +55,6 @@
                 required
               />
               <label
-                class="form-check-label"
                 for="question<%= questionIndex %>_option<%= optionIndex %>"
               >
                 <%= option.optionText %>
@@ -74,6 +71,103 @@
               placeholder="Your answer"
               required
             />
+          </div>
+          <% } else if (question.questionType === 'matching') { %>
+          <div class="form-group matching-question">
+            <% question.options.forEach((option, optionIndex) => { %>
+            <div class="matching-row">
+              <div class="matching-item"><%= option.optionText %></div>
+              <div class="matching-selector">
+                <select
+                  class="form-control"
+                  name="answers[<%= questionIndex %>]"
+                  required
+                >
+                  <option value="">-- Select match --</option>
+                  <% question.options.forEach((matchOption, matchIndex) => { %>
+                  <option
+                    value="<%= option._id %>:::<%= matchOption.matchTo %>"
+                  >
+                    <%= matchOption.matchTo %>
+                  </option>
+                  <% }); %>
+                </select>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+          <% } else if (question.questionType === 'ordering') { %>
+          <div class="form-group ordering-question">
+            <div class="ordering-list">
+              <% const shuffledOptions = [...question.options].sort(() =>
+              Math.random() - 0.5); %> <% shuffledOptions.forEach((option,
+              optionIndex) => { %>
+              <div
+                class="ordering-item"
+                draggable="true"
+                data-id="<%= option._id %>"
+              >
+                <div class="ordering-number"><%= optionIndex + 1 %></div>
+                <div class="ordering-text"><%= option.optionText %></div>
+                <input
+                  type="hidden"
+                  name="answers[<%= questionIndex %>]"
+                  value="<%= option._id %>"
+                />
+              </div>
+              <% }); %>
+            </div>
+            <div class="ordering-instruction">
+              <small>Drag items to arrange in the correct order</small>
+            </div>
+          </div>
+          <% } else if (question.questionType === 'fill-in-blanks') { %>
+          <div class="form-group fill-in-blanks-question">
+            <% let blanksText = question.questionText;
+            question.blankAnswers.forEach((_, index) => { const blankKey =
+            `{blank${index+1}}`; blanksText = blanksText.replace( blankKey,
+            `<input
+              type="text"
+              class="form-control blank-input"
+              name="answers[${questionIndex}]"
+              placeholder="blank ${index+1}"
+              required
+            />` ); }); %>
+            <div class="blanks-text"><%- blanksText %></div>
+          </div>
+          <% } else if (question.questionType === 'image-selection') { %>
+          <div class="form-group image-selection-question">
+            <div class="image-container">
+              <img
+                src="<%= question.imageUrl %>"
+                alt="Question image"
+                class="question-image"
+              />
+              <% question.imageCoordinates.forEach((coord, coordIndex) => { %>
+              <div
+                class="clickable-hotspot"
+                style="
+                  position: absolute;
+                  left: <%= coord.x %>px;
+                  top: <%= coord.y %>px;
+                  width: <%= coord.width %>px;
+                  height: <%= coord.height %>px;
+                "
+                data-id="<%= coord._id %>"
+              >
+                <input
+                  type="checkbox"
+                  name="answers[<%= questionIndex %>]"
+                  value="<%= coord._id %>"
+                  style="display: none"
+                />
+                <span class="hotspot-label"><%= coord.label %></span>
+              </div>
+              <% }); %>
+            </div>
+            <div class="image-selection-instruction">
+              <small>Click on the relevant areas of the image</small>
+            </div>
           </div>
           <% } %>
         </div>
@@ -94,18 +188,119 @@
   </form>
 </div>
 
+<style>
+  .quiz-option {
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    background-color: var(--color-border);
+  }
+</style>
+
 <script>
-  // Add this script to fix multiple checkbox submissions
-  document.getElementById("quizForm").addEventListener("submit", function (e) {
-    // No need to prevent default - let the form submit normally
+  document.addEventListener("DOMContentLoaded", function () {
+    const clickableOptions = document.querySelectorAll(".clickable-option");
 
-    // Check console for debugging info
-    console.log("Form being submitted");
+    clickableOptions.forEach((option) => {
+      option.addEventListener("click", function (e) {
+        if (e.target.tagName !== "INPUT" && e.target.tagName !== "LABEL") {
+          const input = this.querySelector("input");
 
-    // Get all checkbox groups
-    const checkboxGroups = document.querySelectorAll('input[type="checkbox"]');
-    console.log("Found checkbox groups:", checkboxGroups.length);
+          if (input.type === "checkbox") {
+            input.checked = !input.checked;
+          } else if (input.type === "radio") {
+            input.checked = true;
+          }
+
+          const event = new Event("change", { bubbles: true });
+          input.dispatchEvent(event);
+        }
+      });
+    });
+
+    const orderingItems = document.querySelectorAll(".ordering-item");
+    orderingItems.forEach((item) => {
+      item.addEventListener("dragstart", handleDragStart);
+      item.addEventListener("dragover", handleDragOver);
+      item.addEventListener("dragenter", handleDragEnter);
+      item.addEventListener("dragleave", handleDragLeave);
+      item.addEventListener("drop", handleDrop);
+      item.addEventListener("dragend", handleDragEnd);
+    });
+
+    const hotspots = document.querySelectorAll(".clickable-hotspot");
+    hotspots.forEach((hotspot) => {
+      hotspot.addEventListener("click", function () {
+        const checkbox = this.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+
+        if (checkbox.checked) {
+          this.classList.add("selected");
+        } else {
+          this.classList.remove("selected");
+        }
+      });
+    });
   });
+
+  let draggedItem = null;
+
+  function handleDragStart(e) {
+    draggedItem = this;
+    this.style.opacity = "0.4";
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", this.dataset.id);
+  }
+
+  function handleDragOver(e) {
+    if (e.preventDefault) e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    return false;
+  }
+
+  function handleDragEnter(e) {
+    this.classList.add("over");
+  }
+
+  function handleDragLeave(e) {
+    this.classList.remove("over");
+  }
+
+  function handleDrop(e) {
+    if (e.stopPropagation) e.stopPropagation();
+
+    if (draggedItem !== this) {
+      const list = this.parentNode;
+      const items = Array.from(list.children);
+      const fromIndex = items.indexOf(draggedItem);
+      const toIndex = items.indexOf(this);
+
+      if (fromIndex < toIndex) {
+        list.insertBefore(draggedItem, this.nextSibling);
+      } else {
+        list.insertBefore(draggedItem, this);
+      }
+
+      updateOrderingNumbers(list);
+    }
+
+    return false;
+  }
+
+  function handleDragEnd(e) {
+    this.style.opacity = "1";
+
+    document.querySelectorAll(".ordering-item").forEach((item) => {
+      item.classList.remove("over");
+    });
+  }
+
+  function updateOrderingNumbers(list) {
+    const items = list.querySelectorAll(".ordering-item");
+    items.forEach((item, index) => {
+      item.querySelector(".ordering-number").textContent = index + 1;
+    });
+  }
 </script>
 
 <%- include('../partials/footer') %>

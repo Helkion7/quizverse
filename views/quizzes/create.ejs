@@ -6,10 +6,10 @@
     <title><%= title %></title>
     <style>
       .question-container {
-        border: 1px solid #ddd;
+        border: 1px solid var(--color-border);
         padding: 15px;
         margin-bottom: 20px;
-        border-radius: 5px;
+        border-radius: 0;
       }
       .options-container {
         margin-left: 20px;
@@ -19,6 +19,98 @@
       }
       .hidden {
         display: none;
+      }
+      .matching-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .matching-pair {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .matching-pair input {
+        flex: 1;
+      }
+      .matching-arrow {
+        margin: 0 8px;
+        color: var(--color-text-secondary);
+      }
+      .ordering-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .ordering-item input {
+        flex: 1;
+      }
+      .ordering-position {
+        width: 40px;
+        margin-right: 8px;
+      }
+      .blank-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .blank-item input {
+        flex: 1;
+      }
+      .blank-instruction {
+        font-size: 0.8em;
+        color: var(--color-text-secondary);
+        margin-bottom: 8px;
+      }
+      .image-selection-container {
+        margin-top: 12px;
+      }
+      .coordinate-inputs {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      /* Custom radio styling for form groups */
+      .form-group input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+      }
+
+      .form-group input[type="radio"] + label {
+        position: relative;
+        padding-left: 28px;
+        cursor: pointer;
+        margin-right: 16px;
+        display: inline-block;
+      }
+
+      .form-group input[type="radio"] + label:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 2px;
+        width: 18px;
+        height: 18px;
+        border: 1px solid var(--color-border);
+        border-radius: 50%;
+        background-color: transparent;
+        transition: all var(--transition-fast);
+      }
+
+      .form-group input[type="radio"]:checked + label:before {
+        border-color: var(--color-accent);
+      }
+
+      .form-group input[type="radio"]:checked + label:after {
+        content: "";
+        position: absolute;
+        left: 5px;
+        top: 7px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--color-accent);
       }
     </style>
   </head>
@@ -66,13 +158,22 @@
           <div class="form-group">
             <label class="form-label">Visibility</label>
             <div>
-              <label>
-                <input type="radio" name="isPublic" value="true" checked />
-                Public
-              </label>
-              <label>
-                <input type="radio" name="isPublic" value="false" /> Private
-              </label>
+              <input
+                type="radio"
+                name="isPublic"
+                id="radio-public"
+                value="true"
+                checked
+              />
+              <label for="radio-public">Public</label>
+
+              <input
+                type="radio"
+                name="isPublic"
+                id="radio-private"
+                value="false"
+              />
+              <label for="radio-private">Private</label>
             </div>
           </div>
 
@@ -109,6 +210,10 @@
             <option value="multiple-choice">Multiple Choice</option>
             <option value="true-false">True/False</option>
             <option value="short-answer">Short Answer</option>
+            <option value="matching">Matching</option>
+            <option value="ordering">Ordering</option>
+            <option value="fill-in-blanks">Fill in the Blanks</option>
+            <option value="image-selection">Image Selection</option>
           </select>
         </div>
 
@@ -123,12 +228,14 @@
           />
         </div>
 
+        <!-- Multiple Choice Options -->
         <div class="form-group multiple-choice-options">
           <label class="form-label">Options</label>
           <div class="options-container"></div>
           <button type="button" class="btn add-option">Add Option</button>
         </div>
 
+        <!-- True/False Options -->
         <div class="form-group true-false-options hidden">
           <label>
             <input type="radio" name="true-false-QUESTIONID" value="true" />
@@ -140,9 +247,55 @@
           </label>
         </div>
 
+        <!-- Short Answer Option -->
         <div class="form-group short-answer-option hidden">
           <label class="form-label">Correct Answer</label>
           <input type="text" class="form-control correct-answer" />
+        </div>
+
+        <!-- Matching Options -->
+        <div class="form-group matching-options hidden">
+          <label class="form-label">Matching Pairs</label>
+          <div class="matching-container"></div>
+          <button type="button" class="btn add-matching-pair">
+            Add Matching Pair
+          </button>
+        </div>
+
+        <!-- Ordering Options -->
+        <div class="form-group ordering-options hidden">
+          <label class="form-label">Ordered Items</label>
+          <div class="ordering-container"></div>
+          <button type="button" class="btn add-ordering-item">Add Item</button>
+        </div>
+
+        <!-- Fill in the Blanks Options -->
+        <div class="form-group fill-in-blanks-options hidden">
+          <label class="form-label">Blank Answers</label>
+          <p class="blank-instruction">
+            Enter the correct answer for each blank in your question. Use
+            {blank1}, {blank2}, etc. in your question text.
+          </p>
+          <div class="blanks-container"></div>
+          <button type="button" class="btn add-blank">Add Blank</button>
+        </div>
+
+        <!-- Image Selection Options -->
+        <div class="form-group image-selection-options hidden">
+          <label class="form-label">Image URL</label>
+          <input
+            type="text"
+            class="form-control image-url"
+            placeholder="https://example.com/image.jpg"
+          />
+
+          <div class="image-selection-container">
+            <label class="form-label">Clickable Areas</label>
+            <div class="clickable-areas-container"></div>
+            <button type="button" class="btn add-clickable-area">
+              Add Clickable Area
+            </button>
+          </div>
         </div>
 
         <button type="button" class="btn remove-question">
@@ -166,6 +319,94 @@
       </div>
     </template>
 
+    <!-- Matching Pair Template -->
+    <template id="matching-pair-template">
+      <div class="matching-pair">
+        <input
+          type="text"
+          class="form-control matching-item"
+          placeholder="Item to match"
+        />
+        <span class="matching-arrow">→</span>
+        <input
+          type="text"
+          class="form-control matching-match"
+          placeholder="Match to this"
+        />
+        <button type="button" class="btn remove-matching-pair">Remove</button>
+      </div>
+    </template>
+
+    <!-- Ordering Item Template -->
+    <template id="ordering-item-template">
+      <div class="ordering-item">
+        <input
+          type="number"
+          class="form-control ordering-position"
+          placeholder="#"
+          min="1"
+        />
+        <input
+          type="text"
+          class="form-control ordering-text"
+          placeholder="Item text"
+        />
+        <button type="button" class="btn remove-ordering-item">Remove</button>
+      </div>
+    </template>
+
+    <!-- Blank Answer Template -->
+    <template id="blank-template">
+      <div class="blank-item">
+        <span class="blank-number"></span>
+        <input
+          type="text"
+          class="form-control blank-answer"
+          placeholder="Correct answer for this blank"
+        />
+        <button type="button" class="btn remove-blank">Remove</button>
+      </div>
+    </template>
+
+    <!-- Clickable Area Template -->
+    <template id="clickable-area-template">
+      <div class="clickable-area">
+        <label class="form-label">Area Coordinates</label>
+        <div class="coordinate-inputs">
+          <input
+            type="number"
+            class="form-control coord-x"
+            placeholder="X"
+            min="0"
+          />
+          <input
+            type="number"
+            class="form-control coord-y"
+            placeholder="Y"
+            min="0"
+          />
+          <input
+            type="number"
+            class="form-control coord-width"
+            placeholder="Width"
+            min="10"
+          />
+          <input
+            type="number"
+            class="form-control coord-height"
+            placeholder="Height"
+            min="10"
+          />
+        </div>
+        <input
+          type="text"
+          class="form-control area-label"
+          placeholder="Label or description"
+        />
+        <button type="button" class="btn remove-clickable-area">Remove</button>
+      </div>
+    </template>
+
     <script>
       // Initialize variables
       let questionCounter = 0;
@@ -179,6 +420,16 @@
       // Templates
       const questionTemplate = document.getElementById("question-template");
       const optionTemplate = document.getElementById("option-template");
+      const matchingPairTemplate = document.getElementById(
+        "matching-pair-template"
+      );
+      const orderingItemTemplate = document.getElementById(
+        "ordering-item-template"
+      );
+      const blankTemplate = document.getElementById("blank-template");
+      const clickableAreaTemplate = document.getElementById(
+        "clickable-area-template"
+      );
 
       // Add question handler
       addQuestionBtn.addEventListener("click", addQuestion);
@@ -210,11 +461,58 @@
           toggleQuestionType(this);
         });
 
+        // Add specific option handlers for each question type
+
+        // Multiple choice
         const addOptionBtn = questionNode.querySelector(".add-option");
         addOptionBtn.addEventListener("click", function () {
           addOption(
             this.closest(".question-container").querySelector(
               ".options-container"
+            )
+          );
+        });
+
+        // Matching
+        const addMatchingPairBtn =
+          questionNode.querySelector(".add-matching-pair");
+        addMatchingPairBtn.addEventListener("click", function () {
+          addMatchingPair(
+            this.closest(".question-container").querySelector(
+              ".matching-container"
+            )
+          );
+        });
+
+        // Ordering
+        const addOrderingItemBtn =
+          questionNode.querySelector(".add-ordering-item");
+        addOrderingItemBtn.addEventListener("click", function () {
+          addOrderingItem(
+            this.closest(".question-container").querySelector(
+              ".ordering-container"
+            )
+          );
+        });
+
+        // Fill in the blanks
+        const addBlankBtn = questionNode.querySelector(".add-blank");
+        addBlankBtn.addEventListener("click", function () {
+          addBlank(
+            this.closest(".question-container").querySelector(
+              ".blanks-container"
+            )
+          );
+        });
+
+        // Image selection
+        const addClickableAreaBtn = questionNode.querySelector(
+          ".add-clickable-area"
+        );
+        addClickableAreaBtn.addEventListener("click", function () {
+          addClickableArea(
+            this.closest(".question-container").querySelector(
+              ".clickable-areas-container"
             )
           );
         });
@@ -246,6 +544,87 @@
         container.appendChild(optionNode);
       }
 
+      function addMatchingPair(container) {
+        const pairNode = document.importNode(
+          matchingPairTemplate.content,
+          true
+        );
+
+        // Add event listener to remove button
+        const removeBtn = pairNode.querySelector(".remove-matching-pair");
+        removeBtn.addEventListener("click", function () {
+          this.closest(".matching-pair").remove();
+        });
+
+        container.appendChild(pairNode);
+      }
+
+      function addOrderingItem(container) {
+        const itemNode = document.importNode(
+          orderingItemTemplate.content,
+          true
+        );
+
+        // Set the position number based on existing items
+        const position = container.children.length + 1;
+        itemNode.querySelector(".ordering-position").value = position;
+
+        // Add event listener to remove button
+        const removeBtn = itemNode.querySelector(".remove-ordering-item");
+        removeBtn.addEventListener("click", function () {
+          this.closest(".ordering-item").remove();
+
+          // Update position numbers for remaining items
+          const items = container.querySelectorAll(".ordering-item");
+          items.forEach((item, index) => {
+            item.querySelector(".ordering-position").value = index + 1;
+          });
+        });
+
+        container.appendChild(itemNode);
+      }
+
+      function addBlank(container) {
+        const blankNode = document.importNode(blankTemplate.content, true);
+
+        // Set the blank number based on existing blanks
+        const blankNum = container.children.length + 1;
+        blankNode.querySelector(
+          ".blank-number"
+        ).textContent = `Blank ${blankNum}: `;
+
+        // Add event listener to remove button
+        const removeBtn = blankNode.querySelector(".remove-blank");
+        removeBtn.addEventListener("click", function () {
+          this.closest(".blank-item").remove();
+
+          // Update blank numbers for remaining blanks
+          const blanks = container.querySelectorAll(".blank-item");
+          blanks.forEach((blank, index) => {
+            blank.querySelector(".blank-number").textContent = `Blank ${
+              index + 1
+            }: `;
+          });
+        });
+
+        container.appendChild(blankNode);
+      }
+
+      function addClickableArea(container) {
+        const areaNode = document.importNode(
+          clickableAreaTemplate.content,
+          true
+        );
+
+        // Add event listener to remove button
+        const removeBtn = areaNode.querySelector(".remove-clickable-area");
+        removeBtn.addEventListener("click", function () {
+          this.closest(".clickable-area").remove();
+        });
+
+        container.appendChild(areaNode);
+      }
+
       function toggleQuestionType(select) {
         const questionContainer = select.closest(".question-container");
         const multipleChoiceOptions = questionContainer.querySelector(
@@ -257,11 +636,25 @@
         const shortAnswerOption = questionContainer.querySelector(
           ".short-answer-option"
         );
+        const matchingOptions =
+          questionContainer.querySelector(".matching-options");
+        const orderingOptions =
+          questionContainer.querySelector(".ordering-options");
+        const fillInBlanksOptions = questionContainer.querySelector(
+          ".fill-in-blanks-options"
+        );
+        const imageSelectionOptions = questionContainer.querySelector(
+          ".image-selection-options"
+        );
 
         // Hide all
         multipleChoiceOptions.classList.add("hidden");
         trueFalseOptions.classList.add("hidden");
         shortAnswerOption.classList.add("hidden");
+        matchingOptions.classList.add("hidden");
+        orderingOptions.classList.add("hidden");
+        fillInBlanksOptions.classList.add("hidden");
+        imageSelectionOptions.classList.add("hidden");
 
         // Show selected
         switch (select.value) {
@@ -274,6 +667,44 @@
           case "short-answer":
             shortAnswerOption.classList.remove("hidden");
             break;
+          case "matching":
+            matchingOptions.classList.remove("hidden");
+            const matchingContainer = questionContainer.querySelector(
+              ".matching-container"
+            );
+            if (matchingContainer.children.length === 0) {
+              addMatchingPair(matchingContainer);
+              addMatchingPair(matchingContainer);
+            }
+            break;
+          case "ordering":
+            orderingOptions.classList.remove("hidden");
+            const orderingContainer = questionContainer.querySelector(
+              ".ordering-container"
+            );
+            if (orderingContainer.children.length === 0) {
+              addOrderingItem(orderingContainer);
+              addOrderingItem(orderingContainer);
+              addOrderingItem(orderingContainer);
+            }
+            break;
+          case "fill-in-blanks":
+            fillInBlanksOptions.classList.remove("hidden");
+            const blanksContainer =
+              questionContainer.querySelector(".blanks-container");
+            if (blanksContainer.children.length === 0) {
+              addBlank(blanksContainer);
+            }
+            break;
+          case "image-selection":
+            imageSelectionOptions.classList.remove("hidden");
+            const areasContainer = questionContainer.querySelector(
+              ".clickable-areas-container"
+            );
+            if (areasContainer.children.length === 0) {
+              addClickableArea(areasContainer);
+            }
+            break;
         }
       }
 
@@ -282,7 +713,6 @@
 
         const questions = [];
 
-        // Process each question
         document
           .querySelectorAll(".question-container")
           .forEach((container) => {
@@ -301,11 +731,9 @@
               options: [],
             };
 
-            // Process options based on question type
             if (questionType === "multiple-choice") {
               container.querySelectorAll(".option-row").forEach((row) => {
                 const optionText = row.querySelector(".option-text").value;
-                // Don't add empty options
                 if (optionText.trim()) {
                   question.options.push({
                     optionText: optionText,
@@ -314,12 +742,11 @@
                 }
               });
 
-              // Ensure at least one option is selected as correct for multiple choice
               const hasCorrectOption = question.options.some(
                 (opt) => opt.isCorrect
               );
               if (question.options.length > 0 && !hasCorrectOption) {
-                question.options[0].isCorrect = true; // Set first option as correct if none selected
+                question.options[0].isCorrect = true;
               }
             } else if (questionType === "true-false") {
               const trueRadio = container.querySelector('input[value="true"]');
@@ -336,15 +763,84 @@
             } else if (questionType === "short-answer") {
               question.correctAnswer =
                 container.querySelector(".correct-answer").value || "";
+            } else if (questionType === "matching") {
+              container.querySelectorAll(".matching-pair").forEach((pair) => {
+                const item = pair.querySelector(".matching-item").value;
+                const match = pair.querySelector(".matching-match").value;
+
+                if (item.trim() && match.trim()) {
+                  question.options.push({
+                    optionText: item,
+                    matchTo: match,
+                    isCorrect: true,
+                  });
+                }
+              });
+            } else if (questionType === "ordering") {
+              container.querySelectorAll(".ordering-item").forEach((item) => {
+                const text = item.querySelector(".ordering-text").value;
+                const position = parseInt(
+                  item.querySelector(".ordering-position").value
+                );
+
+                if (text.trim()) {
+                  question.options.push({
+                    optionText: text,
+                    orderPosition: position,
+                    isCorrect: true,
+                  });
+                }
+              });
+
+              question.options.sort(
+                (a, b) => a.orderPosition - b.orderPosition
+              );
+            } else if (questionType === "fill-in-blanks") {
+              question.blankAnswers = [];
+              container.querySelectorAll(".blank-item").forEach((blank) => {
+                const answer = blank.querySelector(".blank-answer").value;
+                if (answer.trim()) {
+                  question.blankAnswers.push(answer);
+                }
+              });
+            } else if (questionType === "image-selection") {
+              question.imageUrl = container.querySelector(".image-url").value;
+              question.imageCoordinates = [];
+
+              container.querySelectorAll(".clickable-area").forEach((area) => {
+                const x = parseInt(area.querySelector(".coord-x").value);
+                const y = parseInt(area.querySelector(".coord-y").value);
+                const width = parseInt(
+                  area.querySelector(".coord-width").value
+                );
+                const height = parseInt(
+                  area.querySelector(".coord-height").value
+                );
+                const label = area.querySelector(".area-label").value;
+
+                if (
+                  !isNaN(x) &&
+                  !isNaN(y) &&
+                  !isNaN(width) &&
+                  !isNaN(height) &&
+                  label.trim()
+                ) {
+                  question.imageCoordinates.push({
+                    x,
+                    y,
+                    width,
+                    height,
+                    label,
+                  });
+                }
+              });
             }
 
-            // Add question to array if it has text
             if (questionText.trim()) {
               questions.push(question);
             }
           });
 
-        // Validation - ensure we have at least one question
         if (questions.length === 0) {
           alert("Please add at least one question to your quiz.");
           return;
@@ -353,10 +849,7 @@
         console.log("Submitting questions:", questions);
 
         try {
-          // Set the questions data in the hidden input
           questionsDataInput.value = JSON.stringify(questions);
-
-          // Submit the form
           quizForm.submit();
         } catch (error) {
           console.error("Error preparing form data:", error);

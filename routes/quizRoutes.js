@@ -38,7 +38,7 @@ router.get("/auth-check/:id", (req, res) => {
 
     console.log("Auth check for quiz ID:", quizId);
 
-    if (req.isAuthenticated()) {
+    if (req.user) {
       console.log("User is authenticated, redirecting to quiz");
       return res.redirect(`/quiz/${quizId}`);
     } else {

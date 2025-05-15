@@ -12,13 +12,23 @@ const QuestionSchema = new Schema({
   },
   questionType: {
     type: String,
-    enum: ["multiple-choice", "true-false", "short-answer"],
+    enum: [
+      "multiple-choice",
+      "true-false",
+      "short-answer",
+      "matching",
+      "ordering",
+      "fill-in-blanks",
+      "image-selection",
+    ],
     default: "multiple-choice",
   },
   options: [
     {
       optionText: String,
       isCorrect: Boolean,
+      matchTo: String, // For matching questions
+      orderPosition: Number, // For ordering questions
     },
   ],
   correctAnswer: {
@@ -27,6 +37,17 @@ const QuestionSchema = new Schema({
       return this.questionType === "short-answer";
     },
   },
+  blankAnswers: [String], // For fill-in-the-blanks questions
+  imageCoordinates: [
+    // For image-selection questions
+    {
+      x: Number,
+      y: Number,
+      width: Number,
+      height: Number,
+      label: String,
+    },
+  ],
   points: {
     type: Number,
     default: 10,

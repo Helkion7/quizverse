@@ -340,6 +340,134 @@ exports.postSubmit = async (req, res) => {
           answer.pointsAwarded = question.points;
           totalScore += question.points;
         }
+      } else if (question.questionType === "matching") {
+        // Handle matching questions
+        const selectedMatches = Array.isArray(answers[index])
+          ? answers[index]
+          : [answers[index]];
+        answer.selectedOptions = selectedMatches;
+
+        // Check if all matches are correct
+        let correctCount = 0;
+        const totalPairs = question.options.length;
+
+        selectedMatches.forEach((match) => {
+          const [itemId, matchedTo] = match.split(":::");
+          const option = question.options.id(itemId);
+
+          if (option && option.matchTo === matchedTo) {
+            correctCount++;
+          }
+        });
+
+        // Award points proportionally to how many pairs were matched correctly
+        if (correctCount > 0) {
+          const proportionalScore =
+            (correctCount / totalPairs) * question.points;
+          answer.pointsAwarded = Math.round(proportionalScore);
+          totalScore += answer.pointsAwarded;
+
+          if (correctCount === totalPairs) {
+            answer.isCorrect = true;
+          }
+        }
+      } else if (question.questionType === "ordering") {
+        // Handle ordering questions
+        const selectedOrder = Array.isArray(answers[index])
+          ? answers[index]
+          : [answers[index]];
+        answer.selectedOptions = selectedOrder;
+
+        // Check if the ordering is correct
+        let correctCount = 0;
+        const totalItems = question.options.length;
+
+        selectedOrder.forEach((itemId, position) => {
+          const option = question.options.id(itemId);
+
+          if (option && option.orderPosition === position + 1) {
+            correctCount++;
+          }
+        });
+
+        // Award points proportionally to how many items were correctly ordered
+        if (correctCount > 0) {
+          const proportionalScore =
+            (correctCount / totalItems) * question.points;
+          answer.pointsAwarded = Math.round(proportionalScore);
+          totalScore += answer.pointsAwarded;
+
+          if (correctCount === totalItems) {
+            answer.isCorrect = true;
+          }
+        }
+      } else if (question.questionType === "fill-in-blanks") {
+        // Handle fill-in-the-blanks questions
+        const userAnswers = Array.isArray(answers[index])
+          ? answers[index]
+          : [answers[index]];
+        answer.textAnswer = userAnswers.join(" | ");
+
+        // Check how many blanks were correctly filled
+        let correctCount = 0;
+
+        userAnswers.forEach((userAnswer, i) => {
+          if (
+            question.blankAnswers[i] &&
+            userAnswer.toLowerCase() === question.blankAnswers[i].toLowerCase()
+          ) {
+            correctCount++;
+          }
+        });
+
+        // Award points proportionally
+        if (correctCount > 0) {
+          const proportionalScore =
+            (correctCount / question.blankAnswers.length) * question.points;
+          answer.pointsAwarded = Math.round(proportionalScore);
+          totalScore += answer.pointsAwarded;
+
+          if (correctCount === question.blankAnswers.length) {
+            answer.isCorrect = true;
+          }
+        }
+      } else if (question.questionType === "image-selection") {
+        // Handle image selection questions
+        const selectedAreas = Array.isArray(answers[index])
+          ? answers[index]
+          : [answers[index]];
+        answer.selectedOptions = selectedAreas;
+
+        // Check if the selected areas match the correct areas
+        let correctCount = 0;
+
+        selectedAreas.forEach((areaId) => {
+          // For image selection, we're using the ID of the coordinate record
+          if (
+            question.imageCoordinates.some(
+              (coord) => coord._id.toString() === areaId
+            )
+          ) {
+            correctCount++;
+          }
+        });
+
+        // Award points based on correct selections
+        if (correctCount > 0) {
+          const expectedSelections = question.imageCoordinates.length;
+          const proportionalScore =
+            (correctCount / expectedSelections) * question.points;
+          answer.pointsAwarded = Math.round(proportionalScore);
+          totalScore += answer.pointsAwarded;
+
+          // Only mark as fully correct if all intended areas were selected (and no extras)
+          if (
+            correctCount === expectedSelections &&
+            selectedAreas.length === expectedSelections
+          ) {
+            answer.isCorrect = true;
+          }
+        }
       }
 
       parsedAnswers.push(answer);

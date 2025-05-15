@@ -275,6 +275,167 @@ a:hover {
   color: var(--color-accent);
 }
 
+/* Quiz Attempt Clickable Options */
+.clickable-option {
+  cursor: pointer;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-fast);
+  display: block;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.clickable-option:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-color: var(--color-accent);
+}
+
+.clickable-option input[type="checkbox"]:checked + label,
+.clickable-option input[type="radio"]:checked + label {
+  color: var(--color-accent);
+}
+
+.clickable-option input {
+  margin-right: 10px;
+}
+
+/* Override the existing form-check styles for our quiz */
+.question-options .form-check {
+  margin-bottom: 8px;
+  padding: 0;
+  border: none;
+}
+
+.question-options .form-check:hover {
+  border-color: var(--color-accent);
+}
+
+/* Custom Form Controls */
+/* Custom Radio Buttons & Checkboxes */
+input[type="radio"],
+input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+input[type="radio"] + label,
+input[type="checkbox"] + label {
+  position: relative;
+  cursor: pointer;
+  padding-left: 28px;
+  display: inline-block;
+  color: var(--color-text-primary);
+  transition: color var(--transition-fast);
+}
+
+input[type="radio"] + label:before,
+input[type="checkbox"] + label:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--color-border);
+  background-color: transparent;
+  transition: all var(--transition-fast);
+}
+
+input[type="radio"] + label:before {
+  border-radius: 50%;
+}
+
+input[type="radio"]:checked + label:before,
+input[type="checkbox"]:checked + label:before {
+  border-color: var(--color-accent);
+}
+
+input[type="radio"]:checked + label:after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+}
+
+input[type="checkbox"]:checked + label:after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 12px;
+  border-right: 2px solid var(--color-accent);
+  border-bottom: 2px solid var(--color-accent);
+  transform: rotate(45deg);
+}
+
+/* Custom Select/Dropdown */
+select {
+  -webkit-appearance: none;
+  appearance: none; /* Added standard property for better compatibility */
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 0;
+  padding-right: 24px;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+}
+
+select:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}
+
+/* Custom Range Input */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 2px;
+  background: var(--color-border);
+  outline: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover,
+input[type="range"]::-moz-range-thumb:hover {
+  background: var(--color-text-primary);
+}
+
 /* Animations */
 .animate-fade-in {
   animation: fadeIn var(--transition-fast);
@@ -389,4 +550,169 @@ footer {
   .icon {
     forced-color-adjust: auto;
   }
+}
+
+/* New Question Type Styles */
+
+/* Matching Question */
+.matching-question {
+  margin-top: 16px;
+}
+
+.matching-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  border: 1px solid var(--color-border);
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: 8px;
+}
+
+.matching-item {
+  flex: 1;
+  padding-right: 16px;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.matching-selector {
+  width: 50%;
+}
+
+.matching-selector select {
+  border: 1px solid var(--color-border);
+  padding: 8px;
+  background-position: right 8px center;
+}
+
+/* Ordering Question */
+.ordering-list {
+  margin-top: 16px;
+  border: 1px solid var(--color-border);
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: 8px;
+}
+
+.ordering-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border);
+  cursor: move;
+  transition: all var(--transition-fast);
+}
+
+.ordering-item.over {
+  border: 1px dashed var(--color-accent);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.ordering-number {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--color-border);
+  color: var(--color-text-primary);
+  font-size: 0.75rem;
+  margin-right: 12px;
+}
+
+.ordering-text {
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+.ordering-instruction {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+/* Fill in the Blanks */
+.fill-in-blanks-question {
+  margin-top: 16px;
+}
+
+.blanks-text {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+}
+
+.blank-input {
+  display: inline-block;
+  width: 120px;
+  margin: 0 4px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  font-size: 0.875rem;
+  padding: 2px 4px;
+}
+
+.blank-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-text-primary);
+}
+
+/* Image Selection */
+.image-container {
+  position: relative;
+  margin-top: 16px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.question-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.clickable-hotspot {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.clickable-hotspot:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.clickable-hotspot.selected {
+  background-color: rgba(var(--color-accent-rgb), 0.3);
+  border-color: var(--color-accent);
+}
+
+.hotspot-label {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  font-size: 0.75rem;
+  color: var(--color-text-primary);
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 2px 4px;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.clickable-hotspot:hover .hotspot-label,
+.clickable-hotspot.selected .hotspot-label {
+  opacity: 1;
+}
+
+.image-selection-instruction {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
 }
