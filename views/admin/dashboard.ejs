@@ -1,77 +1,74 @@
 <%- include('../partials/header') %>
 
-<div>
-  <h1>Admin Dashboard</h1>
+<div class="container">
+  <div class="admin-header">
+    <h1>Admin Dashboard</h1>
+    <div id="errorContainer" class="error-container fade-in"></div>
+  </div>
 
-  <div>
-    <div>
-      <h5>User Management</h5>
-      <div>
-        <input type="text" placeholder="Search users..." id="searchInput" />
-        <div>
-          <button type="button" id="searchButton">
-            <i>Search</i>
-          </button>
-        </div>
+  <div class="admin-card">
+    <div class="card-header">
+      <h2>User Management</h2>
+      <div class="search-container focus-container">
+        <input
+          type="text"
+          placeholder="Search users..."
+          id="searchInput"
+          class="search-input"
+        />
+        <button type="button" id="searchButton" class="btn">Search</button>
       </div>
     </div>
 
-    <div>
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="usersTableBody">
-            <!-- User data will be loaded here -->
-          </tbody>
-        </table>
+    <div class="table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <!-- User data will be loaded here -->
+        </tbody>
+      </table>
+
+      <div id="loadingIndicator" class="loading-indicator">
+        <div class="loader"></div>
+        <span>Loading...</span>
       </div>
 
-      <div id="loadingIndicator">
-        <div role="status">
-          <span>Loading...</span>
-        </div>
+      <div id="noResults" class="no-results hidden">
+        No users found matching your search.
       </div>
 
-      <div id="noResults">No users found matching your search.</div>
-
-      <ul id="pagination">
-        <!-- Pagination will be generated here -->
-      </ul>
+      <ul id="pagination" class="pagination"></ul>
     </div>
   </div>
 </div>
 
-<div
-  id="deleteModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="deleteModalLabel"
-  aria-hidden="true"
->
-  <div role="document">
-    <div>
-      <div>
-        <h5 id="deleteModalLabel">Confirm Deletion</h5>
-        <button type="button" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div>
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal hidden">
+  <div class="modal-content slide-in">
+    <div class="modal-header">
+      <h3>Confirm Deletion</h3>
+      <button type="button" class="modal-close" id="closeModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>
         Are you sure you want to delete the user
-        <span id="deleteUserName"></span>? This action cannot be undone.
-      </div>
-      <div>
-        <button type="button" data-dismiss="modal">Cancel</button>
-        <button type="button" id="confirmDelete">Delete</button>
-      </div>
+        <span id="deleteUserName" class="accent-text"></span>?
+      </p>
+      <p>This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn" id="cancelDelete">Cancel</button>
+      <button type="button" class="btn btn-danger" id="confirmDelete">
+        Delete
+      </button>
     </div>
   </div>
 </div>
@@ -82,6 +79,8 @@
     let searchTerm = "";
     const limit = 10;
     let userToDelete = null;
+    const modal = document.getElementById("deleteModal");
+    const errorContainer = document.getElementById("errorContainer");
 
     // Initial load
     loadUsers();
@@ -105,6 +104,12 @@
         }
       });
 
+    // Modal control
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+    document
+      .getElementById("cancelDelete")
+      .addEventListener("click", closeModal);
+
     // Delete user functionality
     document
       .getElementById("confirmDelete")
@@ -114,14 +119,24 @@
         }
       });
 
+    function closeModal() {
+      modal.classList.add("hidden");
+    }
+
     // Function to load users
     function loadUsers() {
       showLoading(true);
+      clearError();
 
       fetch(
         `/admin/users?page=${currentPage}&limit=${limit}&search=${searchTerm}`
       )
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status}`);
+          }
+          return response.json();
+        })
         .then((data) => {
           renderUsers(data.users);
           renderPagination(data.pagination);
@@ -137,31 +152,28 @@
     // Function to render users in the table
     function renderUsers(users) {
       const tableBody = document.getElementById("usersTableBody");
+      const noResults = document.getElementById("noResults");
       tableBody.innerHTML = "";
 
       if (users.length === 0) {
-        document.getElementById("noResults").classList.remove("d-none");
+        noResults.classList.remove("hidden");
         return;
       }
 
-      document.getElementById("noResults").classList.add("d-none");
+      noResults.classList.add("hidden");
 
       users.forEach((user) => {
         const row = document.createElement("tr");
-
-        // Format date
         const createdDate = new Date(user.createdAt);
         const formattedDate = createdDate.toLocaleDateString();
 
         row.innerHTML = `
           <td>${user.username}</td>
           <td>${user.email}</td>
-          <td>${user.role}</td>
+          <td><span class="badge">${user.role}</span></td>
           <td>${formattedDate}</td>
           <td>
-            <button class="delete-btn" data-id="${user._id}" data-username="${user.username}">
-              <i class="fa fa-trash"></i> Delete
-            </button>
+            <button class="btn delete-btn" data-id="${user._id}" data-username="${user.username}">Delete</button>
           </td>
         `;
 
@@ -176,7 +188,7 @@
 
           userToDelete = userId;
           document.getElementById("deleteUserName").textContent = username;
-          $("#deleteModal").modal("show");
+          modal.classList.remove("hidden");
         });
       });
     }
@@ -186,12 +198,16 @@
       const paginationElement = document.getElementById("pagination");
       paginationElement.innerHTML = "";
 
+      if (pagination.totalPages <= 1) return;
+
       // Previous button
-      const prevLi = document.createElement("li");
-      prevLi.innerHTML = `<a href="#" data-page="${
-        pagination.currentPage - 1
-      }">Previous</a>`;
-      paginationElement.appendChild(prevLi);
+      if (pagination.hasPrev) {
+        addPaginationButton(
+          paginationElement,
+          pagination.currentPage - 1,
+          "Previous"
+        );
+      }
 
       // Page numbers
       const totalVisiblePages = 5;
@@ -209,51 +225,69 @@
       }
 
       for (let i = startPage; i <= endPage; i++) {
-        const pageLi = document.createElement("li");
-        pageLi.innerHTML = `<a href="#" data-page="${i}">${i}</a>`;
-        paginationElement.appendChild(pageLi);
+        const isActive = i === pagination.currentPage;
+        addPaginationButton(paginationElement, i, i.toString(), isActive);
       }
 
       // Next button
-      const nextLi = document.createElement("li");
-      nextLi.innerHTML = `<a href="#" data-page="${
-        pagination.currentPage + 1
-      }">Next</a>`;
-      paginationElement.appendChild(nextLi);
+      if (pagination.hasNext) {
+        addPaginationButton(
+          paginationElement,
+          pagination.currentPage + 1,
+          "Next"
+        );
+      }
+    }
 
-      // Add event listeners to pagination links
-      document.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", function (e) {
-          e.preventDefault();
-          currentPage = parseInt(this.getAttribute("data-page"));
-          loadUsers();
-        });
+    function addPaginationButton(parent, page, text, isActive = false) {
+      const li = document.createElement("li");
+      li.classList.add("page-item");
+      if (isActive) li.classList.add("active");
+
+      const a = document.createElement("a");
+      a.textContent = text;
+      a.setAttribute("data-page", page);
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        currentPage = parseInt(this.getAttribute("data-page"));
+        loadUsers();
       });
+
+      li.appendChild(a);
+      parent.appendChild(li);
     }
 
     // Function to delete a user
     function deleteUser(userId) {
+      clearError();
+
       fetch(`/admin/users/${userId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((data) => {
+              throw new Error(data.error || "Failed to delete user");
+            });
+          }
+          return response.json();
+        })
         .then((data) => {
           if (data.success) {
-            $("#deleteModal").modal("hide");
-            loadUsers(); // Reload the user list
-            showAlert("success", "User deleted successfully");
+            closeModal();
+            loadUsers();
+            showNotification("User deleted successfully");
           } else {
             throw new Error(data.error || "Failed to delete user");
           }
         })
         .catch((error) => {
           console.error("Error deleting user:", error);
-          $("#deleteModal").modal("hide");
-          showAlert(
-            "danger",
+          closeModal();
+          showError(
             error.message || "An error occurred while deleting the user"
           );
         });
@@ -263,32 +297,39 @@
     function showLoading(show) {
       const loadingIndicator = document.getElementById("loadingIndicator");
       if (show) {
-        loadingIndicator.classList.remove("d-none");
+        loadingIndicator.classList.remove("hidden");
       } else {
-        loadingIndicator.classList.add("d-none");
+        loadingIndicator.classList.add("hidden");
       }
     }
 
-    function showAlert(type, message) {
-      const alertDiv = document.createElement("div");
-      alertDiv.innerHTML = `
-        ${message}
-        <button type="button" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      `;
-
-      const container = document.querySelector(".container");
-      container.insertBefore(alertDiv, container.firstChild);
+    function showError(message) {
+      errorContainer.textContent = message;
+      errorContainer.classList.add("visible");
+      errorContainer.classList.add("error");
 
       // Auto-dismiss after 5 seconds
       setTimeout(() => {
-        alertDiv.remove();
+        clearError();
       }, 5000);
     }
 
-    function showError(message) {
-      showAlert("danger", message);
+    function showNotification(message) {
+      errorContainer.textContent = message;
+      errorContainer.classList.add("visible");
+      errorContainer.classList.add("success");
+
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => {
+        clearError();
+      }, 5000);
+    }
+
+    function clearError() {
+      errorContainer.textContent = "";
+      errorContainer.classList.remove("visible");
+      errorContainer.classList.remove("error");
+      errorContainer.classList.remove("success");
     }
   });
 </script>

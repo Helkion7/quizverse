@@ -4,6 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
+    <style>
+      :root {
+        --color-background: oklch(0.05 0.01 250);
+        --color-text-primary: oklch(0.9 0.02 250);
+        --color-text-secondary: oklch(0.6 0.01 250);
+        --color-accent: oklch(0.7 0.05 280);
+        --color-border: oklch(0.2 0.01 250);
+        --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .stat-card {
+        background-color: transparent;
+        border: 1px solid var(--color-border);
+        padding: 16px;
+        transition: background-color var(--transition-fast);
+      }
+
+      .stat-card:hover {
+        background-color: rgba(255, 255, 255, 0.03);
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+        font-weight: 200;
+        color: var(--color-accent);
+        letter-spacing: -0.025em;
+      }
+    </style>
   </head>
   <body>
     <%- include('../partials/header') %>
@@ -16,15 +44,15 @@
 
         <div class="dashboard-stats">
           <div class="stat-card">
-            <div class="stat-number">0</div>
+            <div class="stat-number"><%= stats.quizzesTaken %></div>
             <div>Quizzes Taken</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">0</div>
+            <div class="stat-number"><%= stats.quizzesCreated %></div>
             <div>Quizzes Created</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">0%</div>
+            <div class="stat-number"><%= stats.averageScore %>%</div>
             <div>Average Score</div>
           </div>
         </div>

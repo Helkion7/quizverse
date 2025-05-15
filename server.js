@@ -41,12 +41,10 @@ app.set("views", path.join(__dirname, "views"));
 // Replace session user middleware with JWT verification
 app.use((req, res, next) => {
   const token = req.cookies.token;
-  console.log("JWT middleware - Token exists:", !!token);
 
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("JWT decoded:", decoded.id);
 
       req.user = decoded;
       res.locals.user = decoded;

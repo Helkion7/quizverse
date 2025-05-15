@@ -5,6 +5,7 @@ exports.getDashboard = async (req, res) => {
     res.render("admin/dashboard", {
       title: "Admin Dashboard",
       user: req.user,
+      originalUrl: req.originalUrl,
     });
   } catch (err) {
     console.error(err);
