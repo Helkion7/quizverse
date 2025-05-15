@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const dotenv = require("dotenv");
+const http = require("http"); // Add HTTP module
+const socketIo = require("socket.io"); // Add Socket.IO
 
 // Import routes
 const authRoutes = require("./routes/authRoutes");
@@ -11,6 +13,7 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const staticRoutes = require("./routes/staticRoutes");
+const gameRoutes = require("./routes/gameRoutes"); // Add this line
 
 // Load environment variables
 dotenv.config();
@@ -18,6 +21,22 @@ dotenv.config();
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Create HTTP server with Express app
+const server = http.createServer(app);
+
+// Initialize Socket.io with the HTTP server
+const io = socketIo(server, {
+  cors: {
+    origin:
+      process.env.NODE_ENV === "production" ? false : ["http://localhost:3000"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+// Import WebSocket handlers
+require("./socketHandlers")(io);
 
 // Connect to MongoDB
 mongoose
@@ -65,6 +84,7 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/admin", adminRoutes);
 app.use("/quiz", quizRoutes);
+app.use("/game", gameRoutes); // Add this line
 app.use("/", staticRoutes);
 
 // Error handling middleware
@@ -85,7 +105,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start the server
-app.listen(PORT, () => {
+// Start the server (changed from app.listen to server.listen)
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

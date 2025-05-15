@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Join Quiz | QuizVerse</title>
+    <link rel="stylesheet" href="/css/main.css" />
+    <style>
+      :root {
+        --color-background: oklch(0.05 0.01 250);
+        --color-text-primary: oklch(0.9 0.02 250);
+        --color-text-secondary: oklch(0.6 0.01 250);
+        --color-accent: oklch(0.7 0.05 280);
+        --color-border: oklch(0.2 0.01 250);
+        --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      body {
+        background-color: var(--color-background);
+        color: var(--color-text-primary);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 400px;
+        padding: 24px;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+        font-weight: 200;
+        color: var(--color-text-primary);
+        letter-spacing: -0.025em;
+        margin: 0 0 24px 0;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.875rem;
+        color: var(--color-text-secondary);
+      }
+
+      input {
+        width: 100%;
+        background-color: transparent;
+        color: var(--color-text-primary);
+        border: none;
+        border-bottom: 1px solid var(--color-border);
+        padding: 8px 0;
+        font-size: 1rem;
+        transition: border-color var(--transition-fast);
+      }
+
+      input:focus {
+        outline: none;
+        border-bottom-color: var(--color-accent);
+      }
+
+      button {
+        background: transparent;
+        border: 1px solid var(--color-border);
+        color: var(--color-text-secondary);
+        font-size: 0.875rem;
+        cursor: pointer;
+        padding: 12px;
+        width: 100%;
+        margin-top: 16px;
+        transition: all var(--transition-fast);
+      }
+
+      button:hover {
+        color: var(--color-accent);
+        border-color: var(--color-accent);
+      }
+
+      .error-message {
+        color: oklch(0.7 0.15 25);
+        font-size: 0.875rem;
+        margin-top: 16px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Join a Quiz</h1>
+
+      <form id="join-game-form">
+        <div class="form-group">
+          <label for="game-code">Game Code</label>
+          <input
+            type="text"
+            id="game-code"
+            name="gameCode"
+            placeholder="Enter 6-digit code"
+            maxlength="6"
+            autocomplete="off"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="nickname">Your Nickname</label>
+          <input
+            type="text"
+            id="nickname"
+            name="nickname"
+            placeholder="Choose a nickname"
+            maxlength="20"
+            autocomplete="off"
+            required
+          />
+        </div>
+
+        <button type="submit">Join Quiz</button>
+
+        <div id="join-error" class="error-message"></div>
+      </form>
+    </div>
+
+    <script src="/js/joinGame.js"></script>
+  </body>
+</html>
