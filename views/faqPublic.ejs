@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <%- include('partials/header') %>
+    <div class="container fade-in">
+      <div class="card slide-in">
+        <h1>Frequently Asked Questions</h1>
+
+        <!-- existing items -->
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How do I create a quiz?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              You must be registered and logged in. In your dashboard click
+              “Create a Quiz” and follow the prompts to add questions, answers,
+              and settings.
+            </p>
+          </div>
+        </div>
+
+        <!-- new in-depth items -->
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How can I reset my password?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              Go to the <a href="/auth/login">login page</a> and click “Forgot
+              Password”. Enter your email; you’ll receive a link to set a new
+              password securely.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>What question types are supported?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              We support multiple choice, true/false, and short answer. Each can
+              be weighted with points, and you can add explanations for correct
+              answers.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How do I join the leaderboard?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              After completing quizzes, your top scores automatically appear on
+              the public leaderboard. Share your profile link to challenge
+              friends.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Can I add images or media to questions?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              Yes. When creating a quiz, use the “Add Media” button to upload
+              images or embed YouTube/Vimeo links directly into your questions.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <a href="/" class="btn">Back to Home</a>
+        </div>
+      </div>
+    </div>
+    <%- include('partials/footer') %>
+  </body>
+</html>

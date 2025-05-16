@@ -5,7 +5,7 @@ const quizController = require("../controllers/quizController");
 // Placeholder for static controller (will implement later)
 const staticController = {
   getFaq: (req, res) => {
-    res.render("faq", { title: "Frequently Asked Questions" });
+    res.render("faqPublic", { title: "Frequently Asked Questions" });
   },
 };
 

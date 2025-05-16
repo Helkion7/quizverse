@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <%- include('partials/header') %>
+    <div class="container fade-in">
+      <div class="card slide-in">
+        <h1>Admin FAQ & Guides</h1>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How do I approve new quizzes?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              In the Admin Dashboard, navigate to “Pending Quizzes”. Review each
+              submission, then click “Approve” or “Reject” as appropriate.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How can I manage users?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              Go to “User Management” in the admin panel. Here you can view user
+              profiles, adjust roles, or delete accounts.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How do I update site settings?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              Navigate to “Settings” in the sidebar. Adjust application-wide
+              options such as branding, email templates, and security policies.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <a href="/admin/dashboard" class="btn">Back to Dashboard</a>
+        </div>
+      </div>
+    </div>
+    <%- include('partials/footer') %>
+  </body>
+</html>
