@@ -5,7 +5,10 @@
     <h1>Quiz Results</h1>
     <h2><%= quiz.title %></h2>
 
-    <div class="score-circle"><%= percentage %>%</div>
+    <div class="score-circle">
+      <span class="score-value"><%= percentage %></span>
+      <span class="score-symbol">%</span>
+    </div>
 
     <p class="lead">You scored <%= score %> out of <%= maxScore %> points</p>
 
@@ -89,5 +92,84 @@
     </div>
   </div>
 </div>
+
+<style>
+  .results-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+
+  .score-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    margin: 24px 0;
+    background-color: var(--color-background);
+    position: relative;
+    transition: all var(--transition-fast);
+  }
+
+  .score-circle:hover {
+    background-color: rgba(255, 255, 255, 0.025);
+    border-color: var(--color-accent);
+  }
+
+  .score-value {
+    font-size: 2.5rem;
+    font-weight: 200;
+    letter-spacing: -0.05em;
+    color: var(--color-text-primary);
+  }
+
+  .score-symbol {
+    font-size: 1rem;
+    color: var(--color-accent);
+    opacity: 0.7;
+    position: absolute;
+    right: 35px;
+    top: 35px;
+  }
+
+  .question-results {
+    margin-top: 16px;
+  }
+
+  .card {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    margin-bottom: 16px;
+  }
+
+  .btn {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    padding: 6px 12px;
+    margin: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .btn-primary {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .btn-outline {
+    border-color: transparent;
+  }
+</style>
 
 <%- include('../partials/footer') %>

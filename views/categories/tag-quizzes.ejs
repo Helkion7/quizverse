@@ -1,0 +1,152 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+  <div class="tag-header">
+    <h1>Quizzes tagged with "<span class="tag-highlight"><%= tag %></span>"</h1>
+    <p class="text-secondary">Explore quizzes related to this topic</p>
+  </div>
+
+  <div class="tag-actions">
+    <a href="/categories/tags" class="btn-minimal">← All Tags</a>
+  </div>
+
+  <% if (quizzes && quizzes.length > 0) { %>
+  <div class="quizzes-grid">
+    <% quizzes.forEach(quiz => { %>
+    <div class="quiz-item fade-in">
+      <div class="quiz-content">
+        <h3><%= quiz.title %></h3>
+        <p><%= quiz.description || 'No description provided' %></p>
+        <div class="quiz-meta">
+          <span><%= quiz.questions.length %> questions</span>
+          <span
+            >By <%= quiz.creator ? quiz.creator.username : 'Unknown' %></span
+          >
+        </div>
+        <% if (quiz.tags && quiz.tags.length > 0) { %>
+        <div class="quiz-tags">
+          <% quiz.tags.filter(t => t !== tag).slice(0, 3).forEach(otherTag => {
+          %>
+          <a href="/categories/tag/<%= otherTag %>" class="quiz-tag"
+            ><%= otherTag %></a
+          >
+          <% }); %>
+        </div>
+        <% } %>
+      </div>
+      <a href="/quiz/auth-check/<%= quiz._id %>" class="view-quiz-btn"
+        >View Quiz</a
+      >
+    </div>
+    <% }); %>
+  </div>
+  <% } else { %>
+  <div class="no-quizzes">
+    <p>
+      No quizzes found with this tag. Be the first to
+      <a href="/quiz/create">create one</a>!
+    </p>
+  </div>
+  <% } %>
+</div>
+
+<style>
+  .tag-header {
+    margin-bottom: 16px;
+  }
+
+  .tag-header h1 {
+    font-size: 1.25rem;
+    font-weight: 200;
+    margin-bottom: 8px;
+  }
+
+  .tag-highlight {
+    color: var(--color-accent);
+  }
+
+  .text-secondary {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .tag-actions {
+    margin-bottom: 24px;
+  }
+
+  .quizzes-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  @media (min-width: 768px) {
+    .quizzes-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+  }
+
+  .quiz-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    padding: 16px;
+    transition: all var(--transition-fast);
+  }
+
+  .quiz-item:hover {
+    border-color: var(--color-accent);
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  .quiz-content {
+    margin-bottom: 16px;
+  }
+
+  .quiz-content h3 {
+    font-size: 1rem;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+
+  .quiz-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+
+  .quiz-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .quiz-tag {
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+    padding: 2px 8px;
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--color-border);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .quiz-tag:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .no-quizzes {
+    text-align: center;
+    padding: 32px;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+  }
+</style>
+
+<%- include('../partials/footer') %>

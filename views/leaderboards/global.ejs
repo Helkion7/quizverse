@@ -64,4 +64,86 @@
   </div>
 </div>
 
+<style>
+  .leaderboard-card {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    padding: 16px;
+    margin-top: 24px;
+  }
+
+  .leaderboard-card h1 {
+    margin-bottom: 8px;
+  }
+
+  .period-filter {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 8px;
+  }
+
+  .period-btn {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .period-btn:hover {
+    color: var(--color-accent);
+  }
+
+  .period-btn.active {
+    color: var(--color-accent);
+    border-bottom: 1px solid var(--color-accent);
+  }
+
+  .leaderboard-table-container {
+    overflow-x: auto;
+  }
+
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .leaderboard-table th {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-weight: 400;
+  }
+
+  .leaderboard-table td {
+    padding: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  .leaderboard-row:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .rank-cell {
+    color: var(--color-text-secondary);
+    width: 50px;
+  }
+
+  .score-cell {
+    color: var(--color-accent);
+  }
+
+  .leaderboard-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+  }
+</style>
+
 <%- include('../partials/footer') %>

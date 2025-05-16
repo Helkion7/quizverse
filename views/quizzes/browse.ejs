@@ -12,44 +12,237 @@
       <div class="container mt-4">
         <h1>Browse Quizzes</h1>
 
-        <% if (quizzes && quizzes.length > 0) { %>
-        <div class="row">
-          <% quizzes.forEach(quiz => { %>
-          <div class="col-md-4 mb-4">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title"><%= quiz.title %></h5>
-                <h6 class="card-subtitle mb-2 text-muted">
-                  By <%= quiz.creator ? quiz.creator.username : 'Unknown' %>
-                </h6>
-                <p class="card-text">
-                  <%= quiz.description || 'No description provided' %>
-                </p>
-                <p class="card-text">
-                  <small class="text-muted">
-                    <%= quiz.questions.length %> questions • Created <%= new
-                    Date(quiz.createdAt).toLocaleDateString() %>
-                  </small>
-                </p>
-                <a
-                  href="/quiz/auth-check/<%= quiz._id %>"
-                  class="view-quiz-btn"
-                >
-                  View Quiz
-                </a>
-              </div>
+        <div class="filter-container">
+          <form action="/quiz/browse" method="GET" class="filter-form">
+            <div class="filter-group">
+              <input 
+                type="text" 
+                name="search" 
+                placeholder="Search quizzes..." 
+                value="<%= searchQuery || '' %>"
+                class="search-input"
+              />
+              
+              <select name="category" class="filter-select">
+                <option value="">All Categories</option>
+                <% if (categories && categories.length > 0) { %>
+                  <% categories.forEach(category => { %>
+                    <option value="<%= category._id %>" <%= activeCategory === category._id.toString() ? 'selected' : '' %>>
+                      <%= category.name %>
+                    </option>
+                  <% }); %>
+                <% } %>
+              </select>
+              
+              <button type="submit" class="filter-button">Filter</button>
             </div>
+            
+            <% if (popularTags && popularTags.length > 0) { %>
+              <div class="popular-tags">
+                <span class="tag-label">Popular tags:</span>
+                <% popularTags.forEach(tag => { %>
+                  <a href="/quiz/browse?tag=<%= tag.name %>" class="tag <%= activeTag === tag.name ? 'active' : '' %>">
+                    <%= tag.name %> <span class="tag-count"><%= tag.count %></span>
+                  </a>
+                <% }); %>
+                <a href="/categories/tags" class="view-all-tags">View all tags</a>
+              </div>
+            <% } %>
+          </form>
+        </div>
+
+        <% if (quizzes && quizzes.length > 0) { %>
+        <div class="quizzes-grid">
+          <% quizzes.forEach(quiz => { %>
+          <div class="quiz-item fade-in">
+            <div class="quiz-content">
+              <h3><%= quiz.title %></h3>
+              <p><%= quiz.description || 'No description provided' %></p>
+              <div class="quiz-meta">
+                <span><%= quiz.questions.length %> questions</span>
+                <span>By <%= quiz.creator ? quiz.creator.username : 'Unknown' %></span>
+              </div>
+              <% if (quiz.category) { %>
+                <div class="quiz-category">
+                  <a href="/categories/<%= quiz.category.slug %>" class="category-badge">
+                    <%= quiz.category.name %>
+                  </a>
+                </div>
+              <% } %>
+              <% if (quiz.tags && quiz.tags.length > 0) { %>
+                <div class="quiz-tags">
+                  <% quiz.tags.slice(0, 3).forEach(tag => { %>
+                    <a href="/categories/tag/<%= tag %>" class="quiz-tag"><%= tag %></a>
+                  <% }); %>
+                  <% if (quiz.tags.length > 3) { %>
+                    <span class="more-tags">+<%= quiz.tags.length - 3 %></span>
+                  <% } %>
+                </div>
+              <% } %>
+            </div>
+            <a href="/quiz/auth-check/<%= quiz._id %>" class="view-quiz-btn">
+              View Quiz
+            </a>
           </div>
           <% }); %>
         </div>
         <% } else { %>
-        <div class="alert alert-info">
-          No quizzes found. <a href="/quiz/create">Create the first quiz!</a>
+        <div class="no-quizzes">
+          <p>No quizzes found. <a href="/quiz/create">Create the first quiz!</a></p>
         </div>
         <% } %>
+        
+        <div class="browse-actions">
+          <a href="/categories" class="btn-minimal">Browse by Category</a>
+          <a href="/categories/tags" class="btn-minimal">Browse by Tags</a>
+        </div>
       </div>
 
       <%- include('../partials/footer') %>
     </div>
+    
+    <style>
+      .filter-container {
+        margin-bottom: 24px;
+      }
+      
+      .filter-form {
+        background-color: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--color-border);
+        padding: 16px;
+      }
+      
+      .filter-group {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      
+      .search-input {
+        flex: 1;
+        background-color: var(--color-background);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border);
+        padding: 8px;
+      }
+      
+      .filter-select {
+        background-color: var(--color-background);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border);
+        padding: 8px;
+        min-width: 150px;
+      }
+      
+      .filter-button {
+        background-color: var(--color-background);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border);
+        padding: 0 16px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+      
+      .filter-button:hover {
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+      }
+      
+      .popular-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      
+      .tag-label {
+        font-size: 0.75rem;
+        color: var(--color-text-secondary);
+      }
+      
+      .tag {
+        font-size: 0.75rem;
+        color: var(--color-text-secondary);
+        padding: 2px 8px;
+        background-color: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--color-border);
+        text-decoration: none;
+        transition: all var(--transition-fast);
+      }
+      
+      .tag:hover, .tag.active {
+        color: var(--color-accent);
+        border-color: var(--color-accent);
+      }
+      
+      .tag-count {
+        font-size: 0.7em;
+        opacity: 0.7;
+      }
+      
+      .view-all-tags {
+        font-size: 0.75rem;
+        color: var(--color-accent);
+        margin-left: auto;
+      }
+      
+      .quizzes-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      @media (min-width: 768px) {
+        .quizzes-grid {
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+      }
+      
+      .quiz-category {
+        margin-top: 8px;
+      }
+      
+      .category-badge {
+        display: inline-block;
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        background-color: var(--color-accent);
+        color: var(--color-background);
+        opacity: 0.8;
+        text-decoration: none;
+      }
+      
+      .quiz-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      
+      .quiz-tag {
+        font-size: 0.7rem;
+        color: var(--color-text-secondary);
+        padding: 2px 6px;
+        background-color: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--color-border);
+        text-decoration: none;
+      }
+      
+      .quiz-tag:hover {
+        color: var(--color-accent);
+        border-color: var(--color-accent);
+      }
+      
+      .more-tags {
+        font-size: 0.7rem;
+        color: var(--color-text-secondary);
+      }
+      
+      .browse-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 24px;
+      }
+    </style>
   </body>
 </html>

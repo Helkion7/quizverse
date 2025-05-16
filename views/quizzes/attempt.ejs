@@ -204,14 +204,26 @@
     clickableOptions.forEach((option) => {
       option.addEventListener("click", function (e) {
         if (e.target.tagName !== "INPUT" && e.target.tagName !== "LABEL") {
+          // Find closest input element
           const input = this.querySelector("input");
 
+          if (!input) return;
+
+          // Toggle input state
           if (input.type === "checkbox") {
             input.checked = !input.checked;
           } else if (input.type === "radio") {
             input.checked = true;
           }
 
+          // Visual feedback for the user
+          if (input.checked) {
+            this.classList.add("selected-option");
+          } else {
+            this.classList.remove("selected-option");
+          }
+
+          // Trigger change event
           const event = new Event("change", { bubbles: true });
           input.dispatchEvent(event);
         }

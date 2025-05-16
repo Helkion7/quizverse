@@ -1,0 +1,89 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+  <div class="tag-cloud-header">
+    <h1>Tag Cloud</h1>
+    <p class="text-secondary">Discover quizzes through popular tags</p>
+  </div>
+
+  <div class="tag-cloud-container">
+    <% if (tags && tags.length > 0) { %> <% tags.forEach(tag => { // Calculate
+    tag size based on count (min 1, max 5) const minCount =
+    Math.min(...tags.map(t => t.count)); const maxCount = Math.max(...tags.map(t
+    => t.count)); const range = maxCount - minCount || 1; // Map count to a size
+    between 0.75 and 1.5 const size = ((tag.count - minCount) / range) * 0.75 +
+    0.75; // Map count to an opacity between 0.6 and 1 const opacity =
+    ((tag.count - minCount) / range) * 0.4 + 0.6; %>
+    <a
+      href="/categories/tag/<%= tag._id %>"
+      class="tag-item"
+      style="font-size: <%= size %>em; opacity: <%= opacity %>"
+    >
+      <%= tag._id %> <span class="tag-count"><%= tag.count %></span>
+    </a>
+    <% }); %> <% } else { %>
+    <div class="no-tags">
+      <p>No tags found. As more quizzes are created, tags will appear here!</p>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="tag-actions">
+    <a href="/categories" class="btn-minimal">← Browse Categories</a>
+    <a href="/quiz/browse" class="btn-minimal">Browse All Quizzes →</a>
+  </div>
+</div>
+
+<style>
+  .tag-cloud-header {
+    margin-bottom: 24px;
+  }
+
+  .tag-cloud-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 32px 0;
+    min-height: 200px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tag-item {
+    display: inline-block;
+    padding: 4px 12px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border-radius: 2px;
+  }
+
+  .tag-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .tag-count {
+    display: inline-block;
+    font-size: 0.7em;
+    color: var(--color-text-secondary);
+    margin-left: 4px;
+  }
+
+  .tag-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+  }
+
+  .no-tags {
+    text-align: center;
+    padding: 32px;
+    color: var(--color-text-secondary);
+  }
+</style>
+
+<%- include('../partials/footer') %>

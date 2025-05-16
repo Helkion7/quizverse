@@ -1,11 +1,36 @@
 const Quiz = require("../models/Quiz");
 const User = require("../models/User");
+const Category = require("../models/Category");
 const QuizAttempt = require("../models/QuizAttempt");
+const mongoose = require("mongoose");
 
-// Add this helper function to be reused by other routes
-exports.getQuizzes = async () => {
+// Update the getQuizzes method to support filtering
+exports.getQuizzes = async (filters = {}, limit = 10) => {
   try {
-    const quizzes = await Quiz.find().sort({ createdAt: -1 }).limit(10);
+    let query = { isPublic: true };
+
+    // Apply additional filters if provided
+    if (filters.category) {
+      query.category = filters.category;
+    }
+
+    if (filters.tag) {
+      query.tags = { $in: [filters.tag] };
+    }
+
+    if (filters.search) {
+      query.$or = [
+        { title: { $regex: filters.search, $options: "i" } },
+        { description: { $regex: filters.search, $options: "i" } },
+      ];
+    }
+
+    const quizzes = await Quiz.find(query)
+      .populate("creator", "username")
+      .populate("category", "name slug")
+      .sort({ createdAt: -1 })
+      .limit(limit);
+
     return quizzes;
   } catch (error) {
     console.error("Error fetching quizzes:", error);
@@ -13,13 +38,43 @@ exports.getQuizzes = async () => {
   }
 };
 
-// Display quiz browse page
+// Display quiz browse page with filtering
 exports.getBrowse = async (req, res) => {
   try {
-    const quizzes = await exports.getQuizzes();
+    const { category, tag, search } = req.query;
+
+    // Get all categories for the filter dropdown
+    const categories = await Category.find().sort({ name: 1 });
+
+    // Get popular tags
+    const popularTags = await Quiz.aggregate([
+      { $match: { isPublic: true } },
+      { $unwind: "$tags" },
+      { $group: { _id: "$tags", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 15 },
+    ]);
+
+    // Apply filters
+    const filters = {};
+    if (category) filters.category = category;
+    if (tag) filters.tag = tag;
+    if (search) filters.search = search;
+
+    const quizzes = await exports.getQuizzes(filters, 50);
+
     res.render("quizzes/browse", {
       title: "Browse Quizzes",
-      quizzes: quizzes,
+      quizzes,
+      categories,
+      popularTags: popularTags.map((tag) => ({
+        name: tag._id,
+        count: tag.count,
+      })),
+      activeCategory: category,
+      activeTag: tag,
+      searchQuery: search,
+      user: req.user,
     });
   } catch (error) {
     console.error("Error in getBrowse:", error);
@@ -27,18 +82,36 @@ exports.getBrowse = async (req, res) => {
   }
 };
 
-exports.getCreate = (req, res) => {
-  console.log(
-    "getCreate - User:",
-    req.user ? `${req.user.username} (${req.user.role})` : "Not logged in"
-  );
-  res.render("quizzes/create", {
-    title: "Create Quiz",
-    user: req.user,
-    isAuthenticated: !!req.user,
-  });
+// Update getCreate to load categories for selection
+exports.getCreate = async (req, res) => {
+  try {
+    // Get all categories for the dropdown
+    const categories = await Category.find().sort({ name: 1 });
+
+    // Get popular tags for suggestions
+    const popularTags = await Quiz.aggregate([
+      { $unwind: "$tags" },
+      { $group: { _id: "$tags", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 20 },
+    ]);
+
+    res.render("quizzes/create", {
+      title: "Create Quiz",
+      categories,
+      popularTags: popularTags.map((tag) => tag._id),
+      user: req.user,
+      isAuthenticated: !!req.user,
+    });
+  } catch (error) {
+    console.error("Error in getCreate:", error);
+    res
+      .status(500)
+      .render("error", { error: "Failed to load quiz creation form" });
+  }
 };
 
+// Update postCreate to handle category and tags
 exports.postCreate = async (req, res) => {
   console.log("postCreate - Auth status:", !!req.user);
   if (req.user) {
@@ -59,14 +132,68 @@ exports.postCreate = async (req, res) => {
       });
     }
 
-    const { title, description, category, isPublic, questions } = req.body;
+    const {
+      title,
+      description,
+      category: categoryInput,
+      isPublic,
+      questions,
+      tags,
+    } = req.body;
+
+    // Resolve categoryInput → valid ObjectId or fallback
+    let categoryId;
+    if (mongoose.isValidObjectId(categoryInput)) {
+      categoryId = categoryInput;
+    } else {
+      let catDoc = await Category.findOne({ slug: categoryInput });
+      if (!catDoc) {
+        // try matching name, turning hyphens into spaces
+        const nameRegex = new RegExp(
+          `^${categoryInput.replace(/-/g, " ")}$`,
+          "i"
+        );
+        catDoc = await Category.findOne({ name: nameRegex });
+      }
+      if (!catDoc) {
+        // Auto-create any of the fallback slugs as a new Category
+        const defaultName = categoryInput.replace(/-/g, " ");
+        const formattedName = defaultName
+          .split(" ")
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ");
+        catDoc = new Category({
+          name: formattedName,
+          slug: categoryInput.toLowerCase(),
+          description: "",
+          parent: null,
+          icon: "book",
+        });
+        await catDoc.save();
+      }
+      categoryId = catDoc._id;
+    }
+
+    // Process tags if provided
+    let tagArray = [];
+    if (tags) {
+      // Split tags by comma and trim whitespace
+      tagArray = tags
+        .split(",")
+        .map((tag) => tag.trim().toLowerCase())
+        .filter((tag) => tag.length > 0);
+
+      // Limit to 10 tags max
+      tagArray = tagArray.slice(0, 10);
+    }
 
     // Log received data for debugging
     console.log("Received quiz data:", {
       title,
       description,
-      category,
+      category: categoryId,
       isPublic,
+      tags: tagArray,
       questionsType: typeof questions,
       questionsLength: questions
         ? typeof questions === "string"
@@ -108,6 +235,30 @@ exports.postCreate = async (req, res) => {
       }
     }
 
+    // Normalize each question to match QuestionSchema
+    const finalQuestions = parsedQuestions.map((q) => {
+      const question = {
+        questionText: q.text || q.questionText,
+        questionType: q.type || q.questionType,
+        options: Array.isArray(q.options)
+          ? q.options.map((opt) => ({
+              optionText: opt.text || opt.optionText,
+              // pull from the frontend “correct” prop (fallback to opt.isCorrect)
+              isCorrect: opt.correct ?? opt.isCorrect,
+              matchTo: opt.matchTo,
+              orderPosition: opt.orderPosition,
+            }))
+          : [],
+        points: Number(q.points) || 10,
+        timeLimit: q.timeLimit || 30,
+      };
+      if (q.questionImage) question.questionImage = q.questionImage;
+      if (q.correctAnswer) question.correctAnswer = q.correctAnswer;
+      if (q.blankAnswers) question.blankAnswers = q.blankAnswers;
+      if (q.imageCoordinates) question.imageCoordinates = q.imageCoordinates;
+      return question;
+    });
+
     // Fix: Use either _id or id property from req.user
     const userId = req.user._id || req.user.id;
 
@@ -115,10 +266,11 @@ exports.postCreate = async (req, res) => {
     const newQuiz = new Quiz({
       title,
       description,
-      category,
+      category: categoryId,
       isPublic: isPublic === "true",
       creator: userId,
-      questions: parsedQuestions,
+      questions: finalQuestions,
+      tags: tagArray,
     });
 
     // Validate the quiz before saving
@@ -141,7 +293,7 @@ exports.postCreate = async (req, res) => {
     });
 
     // Redirect to the edit page to add questions if none were provided
-    if (!parsedQuestions || parsedQuestions.length === 0) {
+    if (!finalQuestions || finalQuestions.length === 0) {
       return res.redirect(`/quiz/${newQuiz._id}/edit`);
     }
 
@@ -177,6 +329,7 @@ exports.getQuizDetails = async (req, res) => {
     // Find quiz by ID and populate creator information
     const quiz = await Quiz.findById(quizId)
       .populate("creator", "username")
+      .populate("category", "name slug")
       .exec();
 
     if (!quiz) {
@@ -223,6 +376,7 @@ exports.getTake = async (req, res) => {
     // Find quiz by ID
     const quiz = await Quiz.findById(quizId)
       .populate("creator", "username")
+      .populate("category", "name slug")
       .exec();
 
     if (!quiz) {
@@ -251,229 +405,66 @@ exports.postSubmit = async (req, res) => {
   try {
     const quizId = req.params.id;
     console.log("Processing quiz submission for ID:", quizId);
-    console.log("Form data received:", req.body);
+    console.log("Raw form data:", req.body);
 
-    // Find quiz by ID
     const quiz = await Quiz.findById(quizId);
-
     if (!quiz) {
+      console.error("Quiz not found:", quizId);
       return res.status(404).render("error", {
         title: "Quiz Not Found",
         message: "The quiz you're looking for doesn't exist.",
       });
     }
 
-    // Get answers from form
-    let answers = req.body.answers || [];
-    console.log("Received answers:", answers);
+    let answers = req.body.answers || {};
+    console.log("Answers object keys:", Object.keys(answers));
 
-    // Parse answers from form submission
     let parsedAnswers = [];
     let totalScore = 0;
     let maxPossibleScore = 0;
 
-    // Process each question and calculate score
-    quiz.questions.forEach((question, index) => {
-      maxPossibleScore += question.points;
-
-      const answer = {
-        questionId: question._id,
-        isCorrect: false,
-        pointsAwarded: 0,
-        selectedOptions: [],
-        textAnswer: "",
-      };
-
-      // Handle when no answer was provided for this question
-      if (!answers[index]) {
-        parsedAnswers.push(answer);
-        return;
-      }
-
-      if (question.questionType === "multiple-choice") {
-        // Handle multiple choice questions
-        const selectedOptions = Array.isArray(answers[index])
-          ? answers[index]
-          : [answers[index]];
-
-        answer.selectedOptions = selectedOptions;
-
-        // Check if selected options match correct options
-        const correctOptions = question.options
+    quiz.questions.forEach((question, qIndex) => {
+      try {
+        maxPossibleScore += question.points;
+        // Try both ID-keyed and index-keyed answers
+        const rawAns = answers[question._id] ?? answers[qIndex];
+        if (!rawAns) {
+          console.warn(`⚠️ No answer for Q#${qIndex} (id=${question._id})`);
+        }
+        const supplied = Array.isArray(rawAns)
+          ? rawAns
+          : [rawAns].filter(Boolean);
+        const selectedOptions = supplied.map(String);
+        const correctOptionIds = question.options
           .filter((opt) => opt.isCorrect)
           .map((opt) => opt._id.toString());
 
-        // Simple check - all correct options must be selected and no incorrect ones
-        const selectedCount = selectedOptions.length;
-        const correctCount = correctOptions.length;
-        const correctSelected = selectedOptions.filter((id) =>
-          correctOptions.includes(id.toString())
-        ).length;
+        const isCorrect =
+          selectedOptions.length === correctOptionIds.length &&
+          selectedOptions
+            .sort()
+            .every((v, i) => v === correctOptionIds.sort()[i]);
 
-        if (
-          correctSelected === correctCount &&
-          selectedCount === correctCount
-        ) {
-          answer.isCorrect = true;
-          answer.pointsAwarded = question.points;
-          totalScore += question.points;
-        }
-      } else if (question.questionType === "true-false") {
-        // Handle true/false questions
-        const selectedOption = answers[index];
-        answer.selectedOptions = [selectedOption];
+        const answerRecord = {
+          questionId: question._id,
+          isCorrect,
+          pointsAwarded: isCorrect ? question.points : 0,
+          selectedOptions,
+          textAnswer: Array.isArray(rawAns) ? "" : rawAns || "",
+        };
 
-        const correctOption = question.options.find((opt) => opt.isCorrect);
-        if (correctOption && selectedOption === correctOption._id.toString()) {
-          answer.isCorrect = true;
-          answer.pointsAwarded = question.points;
-          totalScore += question.points;
-        }
-      } else if (question.questionType === "short-answer") {
-        // Handle short answer questions
-        const userAnswer = answers[index] || "";
-        answer.textAnswer = userAnswer;
-
-        // Case-insensitive comparison
-        if (userAnswer.toLowerCase() === question.correctAnswer.toLowerCase()) {
-          answer.isCorrect = true;
-          answer.pointsAwarded = question.points;
-          totalScore += question.points;
-        }
-      } else if (question.questionType === "matching") {
-        // Handle matching questions
-        const selectedMatches = Array.isArray(answers[index])
-          ? answers[index]
-          : [answers[index]];
-        answer.selectedOptions = selectedMatches;
-
-        // Check if all matches are correct
-        let correctCount = 0;
-        const totalPairs = question.options.length;
-
-        selectedMatches.forEach((match) => {
-          const [itemId, matchedTo] = match.split(":::");
-          const option = question.options.id(itemId);
-
-          if (option && option.matchTo === matchedTo) {
-            correctCount++;
-          }
-        });
-
-        // Award points proportionally to how many pairs were matched correctly
-        if (correctCount > 0) {
-          const proportionalScore =
-            (correctCount / totalPairs) * question.points;
-          answer.pointsAwarded = Math.round(proportionalScore);
-          totalScore += answer.pointsAwarded;
-
-          if (correctCount === totalPairs) {
-            answer.isCorrect = true;
-          }
-        }
-      } else if (question.questionType === "ordering") {
-        // Handle ordering questions
-        const selectedOrder = Array.isArray(answers[index])
-          ? answers[index]
-          : [answers[index]];
-        answer.selectedOptions = selectedOrder;
-
-        // Check if the ordering is correct
-        let correctCount = 0;
-        const totalItems = question.options.length;
-
-        selectedOrder.forEach((itemId, position) => {
-          const option = question.options.id(itemId);
-
-          if (option && option.orderPosition === position + 1) {
-            correctCount++;
-          }
-        });
-
-        // Award points proportionally to how many items were correctly ordered
-        if (correctCount > 0) {
-          const proportionalScore =
-            (correctCount / totalItems) * question.points;
-          answer.pointsAwarded = Math.round(proportionalScore);
-          totalScore += answer.pointsAwarded;
-
-          if (correctCount === totalItems) {
-            answer.isCorrect = true;
-          }
-        }
-      } else if (question.questionType === "fill-in-blanks") {
-        // Handle fill-in-the-blanks questions
-        const userAnswers = Array.isArray(answers[index])
-          ? answers[index]
-          : [answers[index]];
-        answer.textAnswer = userAnswers.join(" | ");
-
-        // Check how many blanks were correctly filled
-        let correctCount = 0;
-
-        userAnswers.forEach((userAnswer, i) => {
-          if (
-            question.blankAnswers[i] &&
-            userAnswer.toLowerCase() === question.blankAnswers[i].toLowerCase()
-          ) {
-            correctCount++;
-          }
-        });
-
-        // Award points proportionally
-        if (correctCount > 0) {
-          const proportionalScore =
-            (correctCount / question.blankAnswers.length) * question.points;
-          answer.pointsAwarded = Math.round(proportionalScore);
-          totalScore += answer.pointsAwarded;
-
-          if (correctCount === question.blankAnswers.length) {
-            answer.isCorrect = true;
-          }
-        }
-      } else if (question.questionType === "image-selection") {
-        // Handle image selection questions
-        const selectedAreas = Array.isArray(answers[index])
-          ? answers[index]
-          : [answers[index]];
-        answer.selectedOptions = selectedAreas;
-
-        // Check if the selected areas match the correct areas
-        let correctCount = 0;
-
-        selectedAreas.forEach((areaId) => {
-          // For image selection, we're using the ID of the coordinate record
-          if (
-            question.imageCoordinates.some(
-              (coord) => coord._id.toString() === areaId
-            )
-          ) {
-            correctCount++;
-          }
-        });
-
-        // Award points based on correct selections
-        if (correctCount > 0) {
-          const expectedSelections = question.imageCoordinates.length;
-          const proportionalScore =
-            (correctCount / expectedSelections) * question.points;
-          answer.pointsAwarded = Math.round(proportionalScore);
-          totalScore += answer.pointsAwarded;
-
-          // Only mark as fully correct if all intended areas were selected (and no extras)
-          if (
-            correctCount === expectedSelections &&
-            selectedAreas.length === expectedSelections
-          ) {
-            answer.isCorrect = true;
-          }
-        }
+        if (isCorrect) totalScore += question.points;
+        parsedAnswers.push(answerRecord);
+      } catch (qErr) {
+        console.error(
+          `Error in question #${qIndex} (id=${question._id}):`,
+          qErr
+        );
+        throw qErr;
       }
-
-      parsedAnswers.push(answer);
     });
 
-    console.log("Processed answers:", parsedAnswers);
+    console.log("Scored answers:", parsedAnswers);
 
     // Create a new quiz attempt
     const attempt = new QuizAttempt({
@@ -515,11 +506,37 @@ exports.postSubmit = async (req, res) => {
       user: req.user,
     });
   } catch (error) {
-    console.error("Error processing quiz submission:", error);
+    console.error("Error in postSubmit:", error);
     return res.status(500).render("error", {
-      title: "Error",
-      message: "Failed to process quiz submission. Please try again later.",
+      title: "Error processing submission",
+      message: error.message,
+      detail: error.stack,
     });
+  }
+};
+
+// Add method to suggest tags
+exports.getSuggestedTags = async (req, res) => {
+  try {
+    const query = req.query.q || "";
+
+    if (query.length < 2) {
+      return res.json([]);
+    }
+
+    // Find tags that match the query
+    const tags = await Quiz.aggregate([
+      { $unwind: "$tags" },
+      { $match: { tags: { $regex: query, $options: "i" } } },
+      { $group: { _id: "$tags", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+    ]);
+
+    return res.json(tags.map((tag) => tag._id));
+  } catch (error) {
+    console.error("Error suggesting tags:", error);
+    res.status(500).json({ error: "Failed to suggest tags" });
   }
 };
 

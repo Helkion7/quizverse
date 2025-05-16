@@ -6,39 +6,59 @@
     <p class="quiz-description"><%= quiz.description %></p>
 
     <div class="period-filter">
-      <a href="?period=weekly" class="period-btn <%= period === 'weekly' ? 'active' : '' %>">Weekly</a>
-      <a href="?period=monthly" class="period-btn <%= period === 'monthly' ? 'active' : '' %>">Monthly</a>
-      <a href="?period=all-time" class="period-btn <%= period === 'all-time' ? 'active' : '' %>">All-time</a>
+      <a
+        href="?period=weekly"
+        class="period-btn <%= period === 'weekly' ? 'active' : '' %>"
+        >Weekly</a
+      >
+      <a
+        href="?period=monthly"
+        class="period-btn <%= period === 'monthly' ? 'active' : '' %>"
+        >Monthly</a
+      >
+      <a
+        href="?period=all-time"
+        class="period-btn <%= period === 'all-time' ? 'active' : '' %>"
+        >All-time</a
+      >
     </div>
 
     <div class="leaderboard-table-container">
       <% if (leaderboard && leaderboard.length > 0) { %>
-        <table class="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>User</th>
-              <th>Score</th>
-              <th>Date</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% leaderboard.forEach((entry, index) => { %>
-              <tr class="leaderboard-row slide-in" style="animation-delay: <%= index * 0.03 %>s">
-                <td class="rank-cell"><%= index + 1 %></td>
-                <td class="username-cell"><%= entry.username %></td>
-                <td class="score-cell"><%= entry.score %>%</td>
-                <td class="date-cell"><%= new Date(entry.completedAt).toLocaleDateString() %></td>
-                <td class="time-cell"><%= entry.timeSpent ? Math.round(entry.timeSpent / 1000) + 's' : '-' %></td>
-              </tr>
-            <% }); %>
-          </tbody>
-        </table>
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>User</th>
+            <th>Score</th>
+            <th>Date</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% leaderboard.forEach((entry, index) => { %>
+          <tr
+            class="leaderboard-row slide-in"
+            style="animation-delay: <%= index * 0.03 %>s"
+          >
+            <td class="rank-cell"><%= index + 1 %></td>
+            <td class="username-cell"><%= entry.username %></td>
+            <td class="score-cell"><%= entry.score %>%</td>
+            <td class="date-cell">
+              <%= new Date(entry.completedAt).toLocaleDateString() %>
+            </td>
+            <td class="time-cell">
+              <%= entry.timeSpent ? Math.round(entry.timeSpent / 1000) + 's' :
+              '-' %>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
       <% } else { %>
-        <div class="no-results">
-          <p>No leaderboard data available for this quiz yet.</p>
-        </div>
+      <div class="no-results">
+        <p>No leaderboard data available for this quiz yet.</p>
+      </div>
       <% } %>
     </div>
 
@@ -50,5 +70,93 @@
     </div>
   </div>
 </div>
+
+<style>
+  .leaderboard-card {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    padding: 16px;
+    margin-top: 24px;
+  }
+
+  .leaderboard-card h1 {
+    margin-bottom: 8px;
+  }
+
+  .quiz-description {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 24px;
+  }
+
+  .period-filter {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 8px;
+  }
+
+  .period-btn {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .period-btn:hover {
+    color: var(--color-accent);
+  }
+
+  .period-btn.active {
+    color: var(--color-accent);
+    border-bottom: 1px solid var(--color-accent);
+  }
+
+  .leaderboard-table-container {
+    overflow-x: auto;
+  }
+
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .leaderboard-table th {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-weight: 400;
+  }
+
+  .leaderboard-table td {
+    padding: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  .leaderboard-row:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .rank-cell {
+    color: var(--color-text-secondary);
+    width: 50px;
+  }
+
+  .score-cell {
+    color: var(--color-accent);
+  }
+
+  .leaderboard-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+  }
+</style>
 
 <%- include('../partials/footer') %>

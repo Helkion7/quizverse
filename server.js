@@ -13,6 +13,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const staticRoutes = require("./routes/staticRoutes");
 const leaderboardRoutes = require("./routes/leaderboardRoutes");
+const categoryRoutes = require("./routes/categoryRoutes"); // Add new routes
 
 // Load environment variables
 dotenv.config();
@@ -71,6 +72,7 @@ app.use("/user", userRoutes);
 app.use("/admin", adminRoutes);
 app.use("/quiz", quizRoutes);
 app.use("/leaderboard", leaderboardRoutes);
+app.use("/categories", categoryRoutes); // Register new routes
 app.use("/", staticRoutes);
 
 // Error handling middleware

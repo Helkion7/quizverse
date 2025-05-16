@@ -1,0 +1,145 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+  <div class="category-header">
+    <h1>Browse by Category</h1>
+    <p class="text-secondary">Explore quizzes by your interests</p>
+  </div>
+
+  <div class="categories-grid">
+    <% if (categories && categories.length > 0) { %> <%
+    categories.forEach(category => { %>
+    <a href="/categories/<%= category.slug %>" class="category-card">
+      <div class="category-icon">
+        <svg class="icon" viewBox="0 0 24 24">
+          <% if (category.icon === 'code') { %>
+          <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path>
+          <% } else if (category.icon === 'database') { %>
+          <path
+            d="M12 2C8.13 2 4 3.5 4 6v12c0 2.5 4.13 4 8 4s8-1.5 8-4V6c0-2.5-4.13-4-8-4zm0 14c-3.87 0-7-1.5-7-3v-2c1.76 1.21 4.3 2 7 2s5.24-.79 7-2v2c0 1.5-3.13 3-7 3z"
+          ></path>
+          <% } else if (category.icon === 'server') { %>
+          <path
+            d="M5 12H2m20 0h-3M5 4H2m20 0h-3M5 20H2m20 0h-3M6 2h12a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2zm0 12h12a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4a2 2 0 012-2z"
+          ></path>
+          <% } else if (category.icon === 'lock') { %>
+          <path
+            d="M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2zm-2-4V5a5 5 0 00-5-5 5 5 0 00-5 5v2"
+          ></path>
+          <% } else if (category.icon === 'globe') { %>
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path
+            d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
+          ></path>
+          <% } else { %>
+          <!-- Default icon -->
+          <path
+            d="M4 19.5v-15A2.5 2.5 0 016.5 2H20a2 2 0 012 2v14a2 2 0 01-2 2h-15.5a2 2 0 01-2-2zM16 2v10l-4-2-4 2V2"
+          ></path>
+          <% } %>
+        </svg>
+      </div>
+      <div class="category-content">
+        <h3><%= category.name %></h3>
+        <p><%= category.description || 'Explore quizzes in this category' %></p>
+      </div>
+    </a>
+    <% }); %> <% } else { %>
+    <div class="no-categories">
+      <p>No categories found. Check back later!</p>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="tag-cloud-preview">
+    <h2>Popular Tags</h2>
+    <p class="text-secondary">Click on a tag to see related quizzes</p>
+    <div class="tag-cloud-container">
+      <a href="/categories/tags" class="view-all-tags">View all tags</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .category-header {
+    margin-bottom: 24px;
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .category-card {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .category-card:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: var(--color-accent);
+  }
+
+  .category-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-right: 16px;
+  }
+
+  .category-icon .icon {
+    width: 24px;
+    height: 24px;
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+    fill: none;
+  }
+
+  .category-content h3 {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--color-text-primary);
+    margin: 0 0 4px 0;
+  }
+
+  .category-content p {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  .tag-cloud-preview {
+    margin-top: 32px;
+  }
+
+  .view-all-tags {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 0.875rem;
+    color: var(--color-accent);
+    transition: opacity var(--transition-fast);
+  }
+
+  .view-all-tags:hover {
+    opacity: 0.8;
+  }
+
+  .no-categories {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 32px;
+    color: var(--color-text-secondary);
+  }
+</style>
+
+<%- include('../partials/footer') %>

@@ -37,14 +37,47 @@
 
           <div class="form-group">
             <label for="category" class="form-label">Category</label>
-            <select id="category" name="category" class="form-control">
+            <select id="category" name="category" class="form-control" required>
+              <option value="">Select a category</option>
+              <% if (categories && categories.length > 0) { %> <%
+              categories.forEach(category => { %>
+              <option value="<%= category._id %>"><%= category.name %></option>
+              <% }); %> <% } else { %>
               <option value="programming">Programming</option>
               <option value="networking">Networking</option>
               <option value="databases">Databases</option>
               <option value="cybersecurity">Cybersecurity</option>
               <option value="web-development">Web Development</option>
               <option value="other">Other</option>
+              <% } %>
             </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tags" class="form-label">Tags</label>
+            <div class="tags-input-container">
+              <input
+                type="text"
+                id="tags-input"
+                placeholder="Add tags separated by commas"
+                class="form-control"
+              />
+              <input type="hidden" id="tags" name="tags" />
+            </div>
+            <div class="tags-container"></div>
+
+            <% if (popularTags && popularTags.length > 0) { %>
+            <div class="tag-suggestions">
+              <p class="suggestion-label">Popular tags:</p>
+              <div class="suggestions-container">
+                <% popularTags.forEach(tag => { %>
+                <span class="suggestion-tag" data-tag="<%= tag %>"
+                  ><%= tag %></span
+                >
+                <% }); %>
+              </div>
+            </div>
+            <% } %>
           </div>
 
           <div class="form-group">
@@ -307,26 +340,110 @@
     <script>
       // Initialize variables
       let questionCounter = 0;
+      let tags = [];
 
       // DOM elements
       const questionsContainer = document.getElementById("questions-container");
       const addQuestionBtn = document.getElementById("add-question");
       const questionsDataInput = document.getElementById("questions-data");
       const quizForm = document.getElementById("quizForm");
+      const tagsInput = document.getElementById("tags-input");
+      const tagsContainer = document.querySelector(".tags-container");
+      const tagsHiddenInput = document.getElementById("tags");
 
-      // Templates
+      // ensure question template isn’t undefined
       const questionTemplate = document.getElementById("question-template");
+
+      // register other templates and log if missing
       const optionTemplate = document.getElementById("option-template");
+      if (!optionTemplate) console.error("option-template element not found!");
       const matchingPairTemplate = document.getElementById(
         "matching-pair-template"
       );
+      if (!matchingPairTemplate)
+        console.error("matching-pair-template element not found!");
       const orderingItemTemplate = document.getElementById(
         "ordering-item-template"
       );
+      if (!orderingItemTemplate)
+        console.error("ordering-item-template element not found!");
       const blankTemplate = document.getElementById("blank-template");
+      if (!blankTemplate) console.error("blank-template element not found!");
       const clickableAreaTemplate = document.getElementById(
         "clickable-area-template"
       );
+      if (!clickableAreaTemplate)
+        console.error("clickable-area-template element not found!");
+
+      // Add tag handling
+      tagsInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === ",") {
+          e.preventDefault();
+          addTag(this.value.trim());
+          this.value = "";
+        }
+      });
+
+      tagsInput.addEventListener("blur", function () {
+        if (this.value.trim() !== "") {
+          addTag(this.value.trim());
+          this.value = "";
+        }
+      });
+
+      // Add click handlers for tag suggestions
+      document.querySelectorAll(".suggestion-tag").forEach((tag) => {
+        tag.addEventListener("click", function () {
+          addTag(this.dataset.tag);
+        });
+      });
+
+      function addTag(tagText) {
+        if (!tagText) return;
+
+        // Remove any commas and trim whitespace
+        tagText = tagText.replace(/,/g, "").trim().toLowerCase();
+
+        // Don't add if empty or already exists
+        if (tagText === "" || tags.includes(tagText)) return;
+
+        // Add tag to array
+        tags.push(tagText);
+
+        // Update hidden input
+        tagsHiddenInput.value = tags.join(",");
+
+        // Create visual tag element
+        const tagElement = document.createElement("span");
+        tagElement.classList.add("tag-item");
+        tagElement.innerHTML = `
+          ${tagText}
+          <span class="remove-tag" data-tag="${tagText}">&times;</span>
+        `;
+
+        tagsContainer.appendChild(tagElement);
+
+        // Add remove event listener
+        tagElement
+          .querySelector(".remove-tag")
+          .addEventListener("click", function () {
+            removeTag(this.dataset.tag);
+          });
+      }
+
+      function removeTag(tagText) {
+        // Remove from array
+        tags = tags.filter((tag) => tag !== tagText);
+
+        // Update hidden input
+        tagsHiddenInput.value = tags.join(",");
+
+        // Remove visual element
+        const tagElement = document.querySelector(
+          `.remove-tag[data-tag="${tagText}"]`
+        ).parentNode;
+        tagElement.remove();
+      }
 
       // Add question handler
       addQuestionBtn.addEventListener("click", addQuestion);
@@ -430,15 +547,35 @@
       }
 
       function addOption(container) {
-        const optionNode = document.importNode(optionTemplate.content, true);
+        console.log("addOption called, optionTemplate =", optionTemplate);
+        if (!optionTemplate) {
+          console.error("Cannot add option: optionTemplate is undefined");
+          return;
+        }
+        try {
+          const optionNode = document.importNode(optionTemplate.content, true);
 
-        // Add event listener to remove button
-        const removeBtn = optionNode.querySelector(".remove-option");
-        removeBtn.addEventListener("click", function () {
-          this.closest(".option-row").remove();
-        });
+          // assign a unique id to the checkbox and update its label's for-attribute
+          const checkbox = optionNode.querySelector(".option-correct");
+          const label = optionNode.querySelector(
+            'label[for="option-correct-ID"]'
+          );
+          const uniqueId = `option-correct-${Date.now()}-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`;
+          checkbox.id = uniqueId;
+          if (label) label.setAttribute("for", uniqueId);
 
-        container.appendChild(optionNode);
+          // remove-option handler
+          const removeBtn = optionNode.querySelector(".remove-option");
+          removeBtn.addEventListener("click", function () {
+            this.closest(".option-row").remove();
+          });
+
+          container.appendChild(optionNode);
+        } catch (e) {
+          console.error("Error in addOption:", e);
+        }
       }
 
       function addMatchingPair(container) {
@@ -679,5 +816,74 @@
         quizForm.submit();
       }
     </script>
+
+    <style>
+      .tags-input-container {
+        position: relative;
+      }
+
+      .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .tag-item {
+        display: inline-flex;
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--color-border);
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        color: var(--color-text-primary);
+      }
+
+      .remove-tag {
+        margin-left: 6px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        opacity: 0.7;
+        transition: opacity var(--transition-fast);
+      }
+
+      .remove-tag:hover {
+        opacity: 1;
+        color: var(--color-accent);
+      }
+
+      .tag-suggestions {
+        margin-top: 12px;
+      }
+
+      .suggestion-label {
+        font-size: 0.8rem;
+        color: var(--color-text-secondary);
+        margin-bottom: 6px;
+      }
+
+      .suggestions-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .suggestion-tag {
+        display: inline-block;
+        padding: 2px 8px;
+        background-color: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--color-border);
+        font-size: 0.8rem;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+
+      .suggestion-tag:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+      }
+    </style>
   </body>
 </html>

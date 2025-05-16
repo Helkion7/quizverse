@@ -79,7 +79,14 @@ const QuizSchema = new Schema({
     ref: "User",
     required: true,
   },
+  // Updated category field to reference Category model
   category: {
+    type: Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
+  // Legacy category field (for backward compatibility)
+  categoryLegacy: {
     type: String,
     enum: [
       "programming",
@@ -103,6 +110,12 @@ const QuizSchema = new Schema({
       trim: true,
     },
   ],
+  // For faster tag filtering and suggestions
+  tagsCount: {
+    type: Map,
+    of: Number,
+    default: {},
+  },
   attempts: {
     type: Number,
     default: 0,
@@ -119,7 +132,20 @@ const QuizSchema = new Schema({
 
 QuizSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
+
+  // Update tags count
+  if (this.isModified("tags")) {
+    this.tagsCount = new Map();
+    this.tags.forEach((tag) => {
+      this.tagsCount.set(tag, (this.tagsCount.get(tag) || 0) + 1);
+    });
+  }
+
   next();
 });
+
+// Add index for tag and category queries
+QuizSchema.index({ tags: 1 });
+QuizSchema.index({ category: 1 });
 
 module.exports = mongoose.model("Quiz", QuizSchema);

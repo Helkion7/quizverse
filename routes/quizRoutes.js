@@ -58,4 +58,7 @@ router.get("/auth-check/:id", (req, res) => {
 router.get("/:id/take", quizController.getTake);
 router.post("/:id/submit", quizController.postSubmit);
 
+// Add tag suggestion route
+router.get("/api/tags/suggest", quizController.getSuggestedTags);
+
 module.exports = router;

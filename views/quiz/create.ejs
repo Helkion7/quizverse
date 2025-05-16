@@ -1,0 +1,429 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+  <form action="/quiz/create" method="POST">
+    <div class="form-group">
+      <label for="quiz-title">Quiz Title</label>
+      <input
+        type="text"
+        id="quiz-title"
+        name="title"
+        class="form-control"
+        placeholder="Enter quiz title"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="quiz-description">Quiz Description</label>
+      <textarea
+        id="quiz-description"
+        name="description"
+        class="form-control"
+        placeholder="Enter quiz description"
+        required
+      ></textarea>
+    </div>
+    <div id="questions-container">
+      <!-- Questions will be dynamically added here -->
+    </div>
+    <button type="button" class="btn-minimal" id="add-question-btn">
+      Add Question
+    </button>
+    <button type="submit" class="btn-primary">Create Quiz</button>
+  </form>
+</div>
+
+<!-- Question Template -->
+<template id="question-template">
+  <div class="question-container slide-in">
+    <div class="question-header">
+      <h3>Question</h3>
+      <button type="button" class="btn-remove remove-question-btn">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path
+            d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+    <div class="form-group">
+      <input
+        type="text"
+        name="questions[INDEX].text"
+        class="form-control"
+        placeholder="Question text"
+        required
+      />
+    </div>
+    <div class="options-container">
+      <div class="option-group">
+        <input
+          type="radio"
+          name="questions[INDEX].correctOption"
+          value="0"
+          required
+        />
+        <input
+          type="text"
+          name="questions[INDEX].options[0]"
+          class="form-control"
+          placeholder="Option 1"
+          required
+        />
+      </div>
+      <div class="option-group">
+        <input
+          type="radio"
+          name="questions[INDEX].correctOption"
+          value="1"
+          required
+        />
+        <input
+          type="text"
+          name="questions[INDEX].options[1]"
+          class="form-control"
+          placeholder="Option 2"
+          required
+        />
+      </div>
+      <div class="option-group">
+        <input
+          type="radio"
+          name="questions[INDEX].correctOption"
+          value="2"
+          required
+        />
+        <input
+          type="text"
+          name="questions[INDEX].options[2]"
+          class="form-control"
+          placeholder="Option 3"
+          required
+        />
+      </div>
+      <div class="option-group">
+        <input
+          type="radio"
+          name="questions[INDEX].correctOption"
+          value="3"
+          required
+        />
+        <input
+          type="text"
+          name="questions[INDEX].options[3]"
+          class="form-control"
+          placeholder="Option 4"
+          required
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  :root {
+    --color-background: oklch(0.05 0.01 250);
+    --color-text-primary: oklch(0.9 0.02 250);
+    --color-text-secondary: oklch(0.6 0.01 250);
+    --color-accent: oklch(0.7 0.05 280);
+    --color-border: oklch(0.2 0.01 250);
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, sans-serif;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  label {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .form-control {
+    width: 100%;
+    background-color: transparent;
+    color: var(--color-text-primary);
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    padding: 8px 0;
+    transition: border-color var(--transition-fast);
+    font-size: 0.875rem;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-bottom-color: var(--color-accent);
+  }
+
+  .btn-minimal {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 8px 16px;
+    transition: all var(--transition-fast);
+    margin-right: 8px;
+  }
+
+  .btn-minimal:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .btn-primary {
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 8px 16px;
+    transition: all var(--transition-fast);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-accent);
+    color: var(--color-text-primary);
+  }
+
+  .question-container {
+    border: 1px solid var(--color-border);
+    padding: 12px;
+    margin-bottom: 16px;
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .question-header h3 {
+    font-size: 1rem;
+    font-weight: 400;
+    margin: 0;
+    color: var(--color-text-primary);
+  }
+
+  .btn-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .icon {
+    color: var(--color-accent);
+    width: 16px;
+    height: 16px;
+    stroke-width: 1;
+    opacity: 0.7;
+    transition: opacity var(--transition-fast);
+    fill: currentColor;
+  }
+
+  .icon:hover {
+    opacity: 1;
+  }
+
+  .options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .option-group input[type="radio"] {
+    margin: 0;
+  }
+
+  .slide-in {
+    animation: slideIn var(--transition-fast);
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+</style>
+
+<!-- Place JavaScript at the end of the body -->
+<script>
+  // Debug helper - log when script execution starts
+  console.log("Quiz creation script starting...");
+
+  // Global variable to store the question template
+  var QuizApp = {
+    questionTemplate: null,
+    initialized: false,
+
+    // Initialize the application
+    init: function () {
+      console.log("QuizApp initialization started");
+      this.getTemplate();
+      this.setupEventListeners();
+
+      if (this.questionTemplate) {
+        this.addQuestion();
+        this.initialized = true;
+        console.log("QuizApp initialization completed successfully");
+      } else {
+        console.error("Failed to initialize QuizApp: Template not found");
+      }
+    },
+
+    // Get the template element
+    getTemplate: function () {
+      console.log("Attempting to get question template");
+      this.questionTemplate = document.getElementById("question-template");
+
+      if (this.questionTemplate) {
+        console.log("Template found successfully");
+      } else {
+        console.error("Template element not found!");
+      }
+
+      return this.questionTemplate;
+    },
+
+    // Set up event listeners
+    setupEventListeners: function () {
+      console.log("Setting up event listeners");
+
+      // Add question button
+      var addButton = document.getElementById("add-question-btn");
+      if (addButton) {
+        addButton.addEventListener("click", this.addQuestion.bind(this));
+        console.log("Add question button listener attached");
+      } else {
+        console.error("Add question button not found!");
+      }
+
+      // Set up event delegation for remove buttons
+      document.addEventListener(
+        "click",
+        function (event) {
+          if (event.target.closest(".remove-question-btn")) {
+            this.removeQuestion(event.target.closest(".question-container"));
+          }
+        }.bind(this)
+      );
+
+      console.log("Event listeners setup completed");
+    },
+
+    // Add a new question to the container
+    addQuestion: function () {
+      console.log("Adding new question");
+
+      // Try to get the template if not already available
+      if (!this.questionTemplate) {
+        console.log("Template not found, attempting to retrieve it");
+        this.questionTemplate = this.getTemplate();
+
+        if (!this.questionTemplate) {
+          console.error("Cannot add question: template not available");
+          return;
+        }
+      }
+
+      var container = document.getElementById("questions-container");
+      if (!container) {
+        console.error("Questions container not found!");
+        return;
+      }
+
+      var questionIndex = container.children.length;
+      console.log("Creating question with index: " + questionIndex);
+
+      // Create a new question from the template
+      var newQuestion = document.importNode(
+        this.questionTemplate.content,
+        true
+      );
+
+      // Replace INDEX placeholders
+      var inputs = newQuestion.querySelectorAll('input[name*="INDEX"]');
+      inputs.forEach(function (input) {
+        input.name = input.name.replace(/INDEX/g, questionIndex);
+      });
+
+      // Add the new question to the container
+      container.appendChild(newQuestion);
+      console.log("Question added successfully");
+    },
+
+    // Remove a question
+    removeQuestion: function (questionElement) {
+      console.log("Removing question");
+      if (questionElement) {
+        questionElement.remove();
+        console.log("Question removed successfully");
+      }
+    },
+  };
+
+  // Initialize when the DOM is loaded
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      console.log("DOM content loaded event fired");
+      QuizApp.init();
+    });
+  } else {
+    // DOM already loaded
+    console.log("DOM already loaded, initializing immediately");
+    QuizApp.init();
+  }
+
+  // Fallback initialization with window.onload
+  window.addEventListener("load", function () {
+    console.log("Window load event fired");
+    if (!QuizApp.initialized) {
+      console.log("QuizApp not initialized yet, initializing now");
+      QuizApp.init();
+    }
+  });
+
+  // Extra failsafe - check after a short delay
+  setTimeout(function () {
+    if (!QuizApp.initialized) {
+      console.log("Delayed initialization check triggered");
+      QuizApp.init();
+    }
+  }, 500);
+
+  console.log("Quiz creation script loaded completely");
+</script>
+
+<%- include('../partials/footer') %>
