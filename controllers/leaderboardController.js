@@ -136,3 +136,6 @@ exports.getQuizLeaderboard = async (req, res) => {
     });
   }
 };
+
+// export for testing
+exports.getDateForTimePeriod = getDateForTimePeriod;
