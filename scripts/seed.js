@@ -1,4 +1,5 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 const mongoose = require("mongoose");
 const argon2 = require("argon2");
 const User = require("../models/User");
@@ -123,10 +124,14 @@ async function seed() {
           ],
         },
         {
-          questionText: "Marker området for brukergrensesnittet.",
-          questionType: "image-selection",
-          imageCoordinates: [
-            { x: 5, y: 5, width: 100, height: 50, label: "UI" },
+          questionText:
+            "Hvilket brukergrensesnitt-element er viktigst for brukervennlighet?",
+          questionType: "multiple-choice",
+          options: [
+            { optionText: "Navigasjonsmeny", isCorrect: true },
+            { optionText: "Farger", isCorrect: false },
+            { optionText: "Animasjoner", isCorrect: false },
+            { optionText: "Skriftstørrelse", isCorrect: false },
           ],
         },
       ],
@@ -218,10 +223,13 @@ async function seed() {
           ],
         },
         {
-          questionText: "Velg område for databaseikon.",
-          questionType: "image-selection",
-          imageCoordinates: [
-            { x: 10, y: 10, width: 40, height: 40, label: "Database" },
+          questionText: "Hvilket element er viktigst i en databasestruktur?",
+          questionType: "multiple-choice",
+          options: [
+            { optionText: "Tabeller", isCorrect: true },
+            { optionText: "Farger", isCorrect: false },
+            { optionText: "Ikoner", isCorrect: false },
+            { optionText: "Animasjoner", isCorrect: false },
           ],
         },
       ],
@@ -253,15 +261,6 @@ async function seed() {
           options: [
             { optionText: "True", isCorrect: true },
             { optionText: "False", isCorrect: false },
-          ],
-        },
-        {
-          questionText:
-            "Identifiser område i bildet der en serverrack plasseres.",
-          questionType: "image-selection",
-          imageCoordinates: [
-            { x: 10, y: 20, width: 50, height: 100, label: "Serverrack" },
-            { x: 200, y: 150, width: 30, height: 30, label: "Router" },
           ],
         },
         {
@@ -311,10 +310,13 @@ async function seed() {
           ],
         },
         {
-          questionText: "Marker området for serverskap.",
-          questionType: "image-selection",
-          imageCoordinates: [
-            { x: 15, y: 20, width: 80, height: 120, label: "Serverskap" },
+          questionText: "Hvilket nettverk-element er viktigst for sikkerhet?",
+          questionType: "multiple-choice",
+          options: [
+            { optionText: "Brannmur", isCorrect: true },
+            { optionText: "Switch", isCorrect: false },
+            { optionText: "Router", isCorrect: false },
+            { optionText: "Kabel", isCorrect: false },
           ],
         },
       ],

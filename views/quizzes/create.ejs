@@ -138,7 +138,6 @@
             <option value="matching">Matching</option>
             <option value="ordering">Ordering</option>
             <option value="fill-in-blanks">Fill in the Blanks</option>
-            <option value="image-selection">Image Selection</option>
           </select>
         </div>
 
@@ -203,24 +202,6 @@
           </p>
           <div class="blanks-container"></div>
           <button type="button" class="btn add-blank">Add Blank</button>
-        </div>
-
-        <!-- Image Selection Options -->
-        <div class="form-group image-selection-options hidden">
-          <label class="form-label">Image URL</label>
-          <input
-            type="text"
-            class="form-control image-url"
-            placeholder="https://example.com/image.jpg"
-          />
-
-          <div class="image-selection-container">
-            <label class="form-label">Clickable Areas</label>
-            <div class="clickable-areas-container"></div>
-            <button type="button" class="btn add-clickable-area">
-              Add Clickable Area
-            </button>
-          </div>
         </div>
 
         <button type="button" class="btn remove-question">
@@ -298,45 +279,6 @@
       </div>
     </template>
 
-    <!-- Clickable Area Template -->
-    <template id="clickable-area-template">
-      <div class="clickable-area">
-        <label class="form-label">Area Coordinates</label>
-        <div class="coordinate-inputs">
-          <input
-            type="number"
-            class="form-control coord-x"
-            placeholder="X"
-            min="0"
-          />
-          <input
-            type="number"
-            class="form-control coord-y"
-            placeholder="Y"
-            min="0"
-          />
-          <input
-            type="number"
-            class="form-control coord-width"
-            placeholder="Width"
-            min="10"
-          />
-          <input
-            type="number"
-            class="form-control coord-height"
-            placeholder="Height"
-            min="10"
-          />
-        </div>
-        <input
-          type="text"
-          class="form-control area-label"
-          placeholder="Label or description"
-        />
-        <button type="button" class="btn remove-clickable-area">Remove</button>
-      </div>
-    </template>
-
     <script>
       // Initialize variables
       let questionCounter = 0;
@@ -369,11 +311,6 @@
         console.error("ordering-item-template element not found!");
       const blankTemplate = document.getElementById("blank-template");
       if (!blankTemplate) console.error("blank-template element not found!");
-      const clickableAreaTemplate = document.getElementById(
-        "clickable-area-template"
-      );
-      if (!clickableAreaTemplate)
-        console.error("clickable-area-template element not found!");
 
       // Add tag handling
       tagsInput.addEventListener("keydown", function (e) {
@@ -519,18 +456,6 @@
           );
         });
 
-        // Image selection
-        const addClickableAreaBtn = questionNode.querySelector(
-          ".add-clickable-area"
-        );
-        addClickableAreaBtn.addEventListener("click", function () {
-          addClickableArea(
-            this.closest(".question-container").querySelector(
-              ".clickable-areas-container"
-            )
-          );
-        });
-
         const removeQuestionBtn =
           questionNode.querySelector(".remove-question");
         removeQuestionBtn.addEventListener("click", function () {
@@ -644,21 +569,6 @@
         container.appendChild(blankNode);
       }
 
-      function addClickableArea(container) {
-        const areaNode = document.importNode(
-          clickableAreaTemplate.content,
-          true
-        );
-
-        // Add event listener to remove button
-        const removeBtn = areaNode.querySelector(".remove-clickable-area");
-        removeBtn.addEventListener("click", function () {
-          this.closest(".clickable-area").remove();
-        });
-
-        container.appendChild(areaNode);
-      }
-
       function toggleQuestionType(select) {
         const questionContainer = select.closest(".question-container");
         const multipleChoiceOptions = questionContainer.querySelector(
@@ -677,9 +587,6 @@
         const fillInBlanksOptions = questionContainer.querySelector(
           ".fill-in-blanks-options"
         );
-        const imageSelectionOptions = questionContainer.querySelector(
-          ".image-selection-options"
-        );
 
         // Hide all
         multipleChoiceOptions.classList.add("hidden");
@@ -688,7 +595,6 @@
         matchingOptions.classList.add("hidden");
         orderingOptions.classList.add("hidden");
         fillInBlanksOptions.classList.add("hidden");
-        imageSelectionOptions.classList.add("hidden");
 
         // Show selected
         switch (select.value) {
@@ -712,9 +618,6 @@
             break;
           case "fill-in-blanks":
             fillInBlanksOptions.classList.remove("hidden");
-            break;
-          case "image-selection":
-            imageSelectionOptions.classList.remove("hidden");
             break;
         }
       }
@@ -791,21 +694,6 @@
                 blanks.push(answer);
               });
               questionData.blanks = blanks;
-              break;
-            case "image-selection":
-              const imageUrl = container.querySelector(".image-url").value;
-              const clickableAreas = [];
-              const areaItems = container.querySelectorAll(".clickable-area");
-              areaItems.forEach((area) => {
-                const x = area.querySelector(".coord-x").value;
-                const y = area.querySelector(".coord-y").value;
-                const width = area.querySelector(".coord-width").value;
-                const height = area.querySelector(".coord-height").value;
-                const label = area.querySelector(".area-label").value;
-                clickableAreas.push({ x, y, width, height, label });
-              });
-              questionData.imageUrl = imageUrl;
-              questionData.clickableAreas = clickableAreas;
               break;
           }
 

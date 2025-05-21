@@ -256,6 +256,7 @@ exports.postCreate = async (req, res) => {
       if (q.correctAnswer) question.correctAnswer = q.correctAnswer;
       if (q.blankAnswers) question.blankAnswers = q.blankAnswers;
       if (q.imageCoordinates) question.imageCoordinates = q.imageCoordinates;
+      if (q.imageUrl) question.questionImage = q.imageUrl;
       return question;
     });
 
@@ -431,26 +432,60 @@ exports.postSubmit = async (req, res) => {
         if (!rawAns) {
           console.warn(`⚠️ No answer for Q#${qIndex} (id=${question._id})`);
         }
-        const supplied = Array.isArray(rawAns)
-          ? rawAns
-          : [rawAns].filter(Boolean);
-        const selectedOptions = supplied.map(String);
-        const correctOptionIds = question.options
-          .filter((opt) => opt.isCorrect)
-          .map((opt) => opt._id.toString());
 
-        const isCorrect =
-          selectedOptions.length === correctOptionIds.length &&
-          selectedOptions
-            .sort()
-            .every((v, i) => v === correctOptionIds.sort()[i]);
+        // Handle different types of answer formats
+        let selectedOptions = [];
+        let textAnswer = "";
+
+        if (Array.isArray(rawAns)) {
+          selectedOptions = rawAns.map(String);
+        } else if (typeof rawAns === "string") {
+          if (
+            question.questionType === "short-answer" ||
+            question.questionType === "fill-in-blanks"
+          ) {
+            textAnswer = rawAns;
+          } else {
+            selectedOptions = [String(rawAns)];
+          }
+        } else if (rawAns) {
+          selectedOptions = [String(rawAns)];
+        }
+
+        // Determine if the answer is correct
+        let isCorrect = false;
+        if (
+          question.questionType === "multiple-choice" ||
+          question.questionType === "true-false"
+        ) {
+          const correctOptionIds = question.options
+            .filter((opt) => opt.isCorrect)
+            .map((opt) => opt._id.toString());
+
+          isCorrect =
+            selectedOptions.length === correctOptionIds.length &&
+            selectedOptions
+              .sort()
+              .every((v, i) => v === correctOptionIds.sort()[i]);
+        } else if (question.questionType === "short-answer") {
+          isCorrect =
+            textAnswer.trim().toLowerCase() ===
+            question.correctAnswer.trim().toLowerCase();
+        } else if (
+          question.questionType === "matching" ||
+          question.questionType === "ordering"
+        ) {
+          // For matching/ordering, just store the answers - scoring handled separately
+          // The actual checking would need more complex logic
+          isCorrect = false; // Will need custom logic based on question type
+        }
 
         const answerRecord = {
           questionId: question._id,
           isCorrect,
           pointsAwarded: isCorrect ? question.points : 0,
           selectedOptions,
-          textAnswer: Array.isArray(rawAns) ? "" : rawAns || "",
+          textAnswer,
         };
 
         if (isCorrect) totalScore += question.points;

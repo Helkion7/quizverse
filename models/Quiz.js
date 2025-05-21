@@ -19,7 +19,6 @@ const QuestionSchema = new Schema({
       "matching",
       "ordering",
       "fill-in-blanks",
-      "image-selection",
     ],
     default: "multiple-choice",
   },

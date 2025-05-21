@@ -8,7 +8,7 @@ const AnswerSchema = new Schema({
   },
   selectedOptions: [
     {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.Mixed, // Changed from ObjectId to Mixed to accept strings
     },
   ],
   textAnswer: {

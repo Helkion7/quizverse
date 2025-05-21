@@ -135,40 +135,6 @@
             />` ); }); %>
             <div class="blanks-text"><%- blanksText %></div>
           </div>
-          <% } else if (question.questionType === 'image-selection') { %>
-          <div class="form-group image-selection-question">
-            <div class="image-container">
-              <img
-                src="<%= question.imageUrl %>"
-                alt="Question image"
-                class="question-image"
-              />
-              <% question.imageCoordinates.forEach((coord, coordIndex) => { %>
-              <div
-                class="clickable-hotspot"
-                style="
-                  position: absolute;
-                  left: <%= coord.x %>px;
-                  top: <%= coord.y %>px;
-                  width: <%= coord.width %>px;
-                  height: <%= coord.height %>px;
-                "
-                data-id="<%= coord._id %>"
-              >
-                <input
-                  type="checkbox"
-                  name="answers[<%= questionIndex %>]"
-                  value="<%= coord._id %>"
-                  style="display: none"
-                />
-                <span class="hotspot-label"><%= coord.label %></span>
-              </div>
-              <% }); %>
-            </div>
-            <div class="image-selection-instruction">
-              <small>Click on the relevant areas of the image</small>
-            </div>
-          </div>
           <% } %>
         </div>
 
