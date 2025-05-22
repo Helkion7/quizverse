@@ -11,7 +11,10 @@ router.get("/dashboard", adminController.getDashboard);
 
 // Serve FAQ to admins
 router.get("/faq", (req, res) => {
-  res.render("admin/faq", { title: "Admin: FAQ & Guides" });
+  res.render("admin/faq", {
+    title: "Admin: FAQ & Guides",
+    originalUrl: req.originalUrl,
+  });
 });
 
 // API routes for user management

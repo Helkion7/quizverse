@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="/css/admin.css" />
   </head>
   <body>
-    <%- include('partials/header') %>
+    <%- include('../partials/header') %>
+
     <div class="container fade-in">
       <div class="card slide-in">
         <h1>Admin FAQ & Resources</h1>
@@ -209,10 +210,10 @@
             </p>
           </div>
         </div>
+      </div>
 
-        <div class="mt-4">
-          <a href="/admin/dashboard" class="btn">Back to Dashboard</a>
-        </div>
+      <div class="mt-4">
+        <a href="/admin/dashboard" class="btn">Back to Dashboard</a>
       </div>
     </div>
 
@@ -233,7 +234,7 @@
         });
       });
     </script>
-    
-    <%- include('partials/footer') %>
+        
+    <%- include('../partials/footer') %>
   </body>
 </html>

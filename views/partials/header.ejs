@@ -13,8 +13,93 @@
     <% if (locals.user && locals.user.role === 'admin' && locals.originalUrl && locals.originalUrl.startsWith('/admin')) { %>
     <link rel="stylesheet" href="/css/admin.css">
     <% } %>
+    <style>
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity var(--transition-fast);
+        }
+        
+        .music-control:hover {
+            opacity: 1;
+        }
+        
+        .music-control .icon {
+            width: 20px;
+            height: 20px;
+            color: var(--color-text-primary);
+        }
+    </style>
 </head>
 <body>
+    <!-- Background music -->
+    <audio id="backgroundMusic" loop>
+        <source src="/music/Edvard-grieg-morning-mood.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <!-- Music control button -->
+    <div class="music-control" id="musicControl" title="Toggle Music">
+        <svg class="icon" id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            const musicControl = document.getElementById('musicControl');
+            const musicIcon = document.getElementById('musicIcon');
+            
+            // Check stored preference
+            const musicEnabled = localStorage.getItem('musicEnabled') !== 'false';
+            
+            // Set initial state
+            if (musicEnabled) {
+                backgroundMusic.play().catch(e => {
+                    console.log('Autoplay prevented by browser. User interaction required.');
+                });
+            } else {
+                updateMusicIcon(false);
+            }
+            
+            // Toggle music on/off
+            musicControl.addEventListener('click', function() {
+                if (backgroundMusic.paused) {
+                    backgroundMusic.play();
+                    localStorage.setItem('musicEnabled', 'true');
+                    updateMusicIcon(true);
+                } else {
+                    backgroundMusic.pause();
+                    localStorage.setItem('musicEnabled', 'false');
+                    updateMusicIcon(false);
+                }
+            });
+            
+            // Update icon based on state
+            function updateMusicIcon(playing) {
+                if (playing) {
+                    musicIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+                } else {
+                    musicIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+                }
+            }
+        });
+    </script>
+    
     <header>
         <div class="container">
             <nav class="navbar">
