@@ -2,6 +2,10 @@
 
 An interactive, minimalist quiz platform built with Node.js, Express, MongoDB and EJS.
 
+## Version
+
+Current version: **1.0.0**
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)

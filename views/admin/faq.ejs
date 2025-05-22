@@ -10,41 +10,202 @@
     <%- include('partials/header') %>
     <div class="container fade-in">
       <div class="card slide-in">
-        <h1>Admin FAQ & Guides</h1>
+        <h1>Admin FAQ & Resources</h1>
+        
+        <!-- User Management -->
+        <h2>User Management</h2>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How do I manage user permissions?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              User roles are either "user" or "admin". To change a user's role:
+              <ol>
+                <li>Navigate to User Management in the dashboard</li>
+                <li>Find the user via search</li>
+                <li>Use the "Edit Role" option in the Actions menu</li>
+                <li>Only promote trusted users to admin status</li>
+              </ol>
+            </p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>When should I delete a user account?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              User deletion should be considered only in these cases:
+              <ul>
+                <li>Multiple violations of terms of service</li>
+                <li>Explicit user request (data privacy compliance)</li>
+                <li>Spam or bot accounts</li>
+              </ul>
+              Note: Deleting a user will permanently remove all their quizzes and attempts.
+            </p>
+          </div>
+        </div>
+
+        <!-- Content Moderation -->
+        <h2>Content Management</h2>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How do I review and approve new quizzes?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              In the Admin Dashboard, navigate to the "Content Moderation" section:
+              <ol>
+                <li>Click on "Pending Quizzes" to view submissions awaiting approval</li>
+                <li>Review each quiz for appropriate content and formatting</li>
+                <li>Use the "Preview" button to take the quiz as a user would</li>
+                <li>Click "Approve" or "Reject" based on your assessment</li>
+                <li>For rejections, provide feedback to the quiz creator</li>
+              </ol>
+            </p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>What content moderation guidelines should I follow?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              When reviewing quizzes, enforce these guidelines:
+              <ul>
+                <li>No offensive, discriminatory, or harmful content</li>
+                <li>Questions should be factually accurate when presenting as factual</li>
+                <li>Quiz questions should be clear and well-formatted</li>
+                <li>Images must be appropriate and relevant</li>
+                <li>Copyright material should be properly attributed</li>
+              </ul>
+            </p>
+          </div>
+        </div>
+
+        <!-- Categories & Tags -->
+        <h2>Categories & Taxonomy</h2>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How do I manage quiz categories?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              To manage categories:
+              <ol>
+                <li>Go to Admin → Categories in the sidebar</li>
+                <li>Here you can create, edit, or archive categories</li>
+                <li>When creating categories, use clear, descriptive names</li>
+                <li>Categories should be broad enough to contain multiple quizzes</li>
+                <li>You can create parent-child category relationships for hierarchical organization</li>
+              </ol>
+            </p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How should I handle tag management?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              Unlike categories, tags are user-generated. To manage tags:
+              <ul>
+                <li>Monitor popular tags via Analytics → Tag Usage</li>
+                <li>Merge similar tags using the Tag Management tool</li>
+                <li>You can blacklist inappropriate tags in Settings → Content Filters</li>
+                <li>Promoting useful tags can be done via the Featured Tags section</li>
+              </ul>
+            </p>
+          </div>
+        </div>
+
+        <!-- System Settings -->
+        <h2>System Administration</h2>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How do I handle database backups?</span
+            ><span class="toggle-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>
+              Database backups are crucial for system integrity:
+              <ol>
+                <li>Automatic backups occur daily at 3 AM server time</li>
+                <li>Manual backups can be initiated from System → Backup</li>
+                <li>Backups are stored for 30 days by default</li>
+                <li>To restore from a backup, use the System → Restore interface</li>
+                <li>Always create a new backup before major system changes</li>
+              </ol>
+            </p>
+          </div>
+        </div>
 
         <div class="faq-item">
           <div class="faq-question">
-            <span>How do I approve new quizzes?</span
+            <span>How do I update the application settings?</span
             ><span class="toggle-icon">+</span>
           </div>
           <div class="faq-answer">
             <p>
-              In the Admin Dashboard, navigate to “Pending Quizzes”. Review each
-              submission, then click “Approve” or “Reject” as appropriate.
+              System-wide settings can be modified in the Admin → Settings panel:
+              <ul>
+                <li>Site branding (name, logo, colors) under "Appearance"</li>
+                <li>Email templates and notification settings under "Communications"</li>
+                <li>Quiz creation rules and limits under "Functionality"</li>
+                <li>Security settings including password policies under "Security"</li>
+                <li>Changes to core settings require admin approval by a second admin</li>
+              </ul>
             </p>
           </div>
         </div>
+
+        <!-- Analytics & Reporting -->
+        <h2>Analytics & Reporting</h2>
         <div class="faq-item">
           <div class="faq-question">
-            <span>How can I manage users?</span
+            <span>Where can I find usage statistics?</span
             ><span class="toggle-icon">+</span>
           </div>
           <div class="faq-answer">
             <p>
-              Go to “User Management” in the admin panel. Here you can view user
-              profiles, adjust roles, or delete accounts.
+              Access platform analytics through the Admin → Analytics section:
+              <ul>
+                <li>User growth and engagement metrics on the Overview dashboard</li>
+                <li>Quiz completion rates under "Content Performance"</li>
+                <li>Category popularity comparisons under "Content Metrics"</li>
+                <li>User retention statistics under "User Engagement"</li>
+                <li>Export any report as CSV, PDF, or JSON using the Export button</li>
+              </ul>
             </p>
           </div>
         </div>
+
         <div class="faq-item">
           <div class="faq-question">
-            <span>How do I update site settings?</span
+            <span>How do I respond to abuse reports?</span
             ><span class="toggle-icon">+</span>
           </div>
           <div class="faq-answer">
             <p>
-              Navigate to “Settings” in the sidebar. Adjust application-wide
-              options such as branding, email templates, and security policies.
+              User-submitted reports require prompt review:
+              <ol>
+                <li>Access reports via Admin → Reports</li>
+                <li>Reports are sorted by severity and timestamp</li>
+                <li>Review the flagged content and reporter comments</li>
+                <li>Choose an action: dismiss, warn user, remove content, or suspend account</li>
+                <li>All moderation actions are logged for accountability</li>
+                <li>High-priority reports (harassment, illegal content) should be addressed within 24 hours</li>
+              </ol>
             </p>
           </div>
         </div>
@@ -54,6 +215,25 @@
         </div>
       </div>
     </div>
+
+    <script>
+      // FAQ toggle functionality
+      document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', function() {
+          const answer = this.nextElementSibling;
+          const icon = this.querySelector('.toggle-icon');
+          
+          if (answer.classList.contains('open')) {
+            answer.classList.remove('open');
+            icon.textContent = '+';
+          } else {
+            answer.classList.add('open');
+            icon.textContent = '−';
+          }
+        });
+      });
+    </script>
+    
     <%- include('partials/footer') %>
   </body>
 </html>
